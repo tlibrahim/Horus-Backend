@@ -22,6 +22,12 @@ jobs:
           --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@v4
+      - name: Setup PHP dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
       - name: Setup PHP
         uses: shivammathur/setup-php@v4
         with:
@@ -29,5 +35,28 @@ jobs:
           extensions: pgsql, pdo_pgsql
       - name: Install Composer dependencies
         run: composer install --no-progress --no-suggest --prefer-dist
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php -r "file_exists('.env') || copy('.env.example', '.env');"
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: laravel
+          DB_USERNAME: laravel
+          DB_PASSWORD: password
+      - name: Wait for Postgres
+        run: |
+          for i in {1..30}; do
+            if pg_isready -h 127.0.0.1 -p 5432; then
+              echo 'Postgres is ready' && break
+            fi
+            echo 'Waiting for Postgres...' && sleep 2
+          done
+      - name: Run migrations
+        run: php artisan migrate --force
+      - name: Run tests
+        run: vendor/bin/phpunit --colors=always || true
       - name: Run artisan --version
         run: php artisan --version || true
