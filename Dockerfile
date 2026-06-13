@@ -19,4 +19,9 @@ RUN useradd -G www-data,root -u 1000 -d /home/dev dev || true
 RUN chown -R dev:dev /var/www/html
 USER dev
 
+# Copy DB wait script (image will have it at /usr/local/bin)
+COPY --chown=dev:dev docker/wait-for-postgres.sh /usr/local/bin/wait-for-postgres.sh
+RUN chmod +x /usr/local/bin/wait-for-postgres.sh || true
+
+ENTRYPOINT ["/usr/local/bin/wait-for-postgres.sh"]
 CMD ["php-fpm"]
