@@ -27,9 +27,6 @@ fresh:
 tinker:
 	docker compose exec app php artisan tinker
 
-test:
-	docker compose exec app php artisan test
-
 logs:
 	docker compose logs -f
 
@@ -38,3 +35,17 @@ queue:
 
 composer:
 	docker compose exec app composer install
+
+lint:
+	docker compose exec app ./vendor/bin/pint --test
+
+fix:
+	docker compose exec app ./vendor/bin/pint
+
+test:
+	docker compose exec app php artisan test
+
+stan:
+	docker compose exec app ./vendor/bin/phpstan analyse --memory-limit=1G
+
+ci: lint test stan
