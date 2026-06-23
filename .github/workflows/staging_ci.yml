@@ -2,9 +2,9 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ "main", "staging", "dev" ]
+    # branches: [ "main", "staging", "dev" ]
   pull_request:
-    branches: [ "main", "staging", "dev" ]
+    # branches: [ "main", "staging", "dev" ]
 
 jobs:
   test:
