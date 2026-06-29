@@ -11,9 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vehicles', function (Blueprint $table) {
+        Schema::create('roles', function (Blueprint $table) {
             $table->id();
+
+            $table->string('name');
+            $table->string('guard_name')->default('api');
+
+            $table->string('display_name')->nullable();
+            $table->text('description')->nullable();
+
+            $table->boolean('is_system')->default(false);
+
             $table->timestamps();
+
+            $table->unique(['name', 'guard_name']);
         });
     }
 
@@ -22,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vehicles');
+        Schema::dropIfExists('roles');
     }
 };

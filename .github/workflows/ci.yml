@@ -47,6 +47,10 @@ jobs:
 
       - name: Generate app key
         run: php artisan key:generate
+      
+      - name: Configure cache driver
+        run: |
+          echo "CACHE_STORE=file" >> .env  
 
       - name: Run migrations
         env:
@@ -57,6 +61,16 @@ jobs:
           DB_USERNAME: horus
           DB_PASSWORD: secret
         run: php artisan migrate
+
+      - name: Seed the database
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: horusdrive
+          DB_USERNAME: horus
+          DB_PASSWORD: secret
+        run: php artisan db:seed
 
       - name: Run PHPUnit tests
         run: php artisan test

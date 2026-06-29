@@ -1,0 +1,11 @@
+<?php
+
+namespace Modules\Core\Enums;
+
+enum UserStatus: string
+{
+    case ACTIVE = 'active';
+    case INACTIVE = 'inactive';
+    case SUSPENDED = 'suspended';
+    case PENDING = 'pending';
+}
