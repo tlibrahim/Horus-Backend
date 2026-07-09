@@ -30,11 +30,26 @@ class TimezoneSeeder extends Seeder
                 'utc_offset' => '+04:00',
                 'is_active' => true,
             ],
+            [
+                'name' => 'Asia/Tokyo',
+                'utc_offset' => '+09:00',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'America/New_York',
+                'utc_offset' => '-05:00',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Europe/Berlin',
+                'utc_offset' => '+01:00',
+                'is_active' => true,
+            ],
         ];
 
         foreach ($timezones as $timezone) {
             Timezone::updateOrCreate(
-                ['utc_offset' => $timezone['utc_offset']],
+                ['name' => $timezone['name']],
                 $timezone
             );
         }

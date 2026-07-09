@@ -42,6 +42,30 @@ class CurrencySeeder extends Seeder
                 'currency_symbol' => 'د.إ',
                 'is_active' => true,
             ],
+            [
+                'code' => 'JPY',
+                'symbol' => 'JPY',
+                'name' => 'Japanese Yen',
+                'is_default' => false,
+                'currency_symbol' => '¥',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'EUR',
+                'symbol' => 'EUR',
+                'name' => 'Euro',
+                'is_default' => false,
+                'currency_symbol' => '€',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'KRW',
+                'symbol' => 'KRW',
+                'name' => 'South Korean Won',
+                'is_default' => false,
+                'currency_symbol' => '₩',
+                'is_active' => true,
+            ],
         ];
 
         foreach ($currencies as $currency) {
