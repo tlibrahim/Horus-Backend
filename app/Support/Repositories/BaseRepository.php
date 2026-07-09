@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Support\Repositories;
 
-use App\Support\Contracts\RepositoryInterface;
+use App\Support\Contracts\CrudRepositoryInterface;
 use App\Support\Filtering\FilterInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-abstract class BaseRepository implements RepositoryInterface
+abstract class BaseRepository implements CrudRepositoryInterface
 {
     /**
      * Get the model class handled by the repository.
@@ -51,7 +51,7 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * Retrieve paginated records.
      */
-    public function paginate(int $perPage = 15, array $columns = ['*'], ?FilterInterface $filter = null): LengthAwarePaginator
+    public function paginate(int $perPage = 15, ?FilterInterface $filter = null, array $columns = ['*']): LengthAwarePaginator
     {
         $query = $this->query();
 

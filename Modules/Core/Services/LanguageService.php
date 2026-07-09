@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Services;
 
-use App\Support\Services\BaseService;
+use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Core\Contracts\LanguageRepositoryInterface;
@@ -12,7 +12,7 @@ use Modules\Core\Contracts\LanguageServiceInterface;
 use Modules\Core\Filters\LanguageFilter;
 use Modules\Core\Models\Language;
 
-final class LanguageService extends BaseService implements LanguageServiceInterface
+final class LanguageService extends BaseCrudService implements LanguageServiceInterface
 {
     public function __construct(
         private readonly LanguageRepositoryInterface $languages,
@@ -20,34 +20,29 @@ final class LanguageService extends BaseService implements LanguageServiceInterf
 
     public function all(): Collection
     {
-        return $this->languages->all();
+        return $this->allFromRepository();
     }
 
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
-        return $this->languages->paginate(
-            perPage: $perPage,
-            filter: new LanguageFilter(request()),
-        );
+        return $this->paginateFromRepository($perPage);
     }
 
     public function options(): Collection
     {
-        return $this->languages->options();
+        return $this->optionsFromRepository();
     }
 
     public function find(int|string $id): Language
     {
         /** @var Language */
-        return $this->languages->findOrFail($id);
+        return $this->findFromRepository($id);
     }
 
     public function create(array $attributes): Language
     {
         /** @var Language */
-        return $this->transaction(
-            fn () => $this->languages->create($attributes)
-        );
+        return $this->createFromRepository($attributes);
     }
 
     public function update(
@@ -55,27 +50,29 @@ final class LanguageService extends BaseService implements LanguageServiceInterf
         array $attributes,
     ): Language {
         /** @var Language */
-        return $this->transaction(
-            fn () => $this->languages->update($language, $attributes)
-        );
+        return $this->updateFromRepository($language, $attributes);
     }
 
     public function toggleStatus(
         Language $language,
         bool $isActive,
     ): Language {
-        return $this->transaction(function () use ($language, $isActive) {
-            /** @var Language */
-            return $this->languages->update($language, [
-                'is_active' => $isActive,
-            ]);
-        });
+        /** @var Language */
+        return $this->toggleStatusOnRepository($language, $isActive);
     }
 
     public function delete(Language $language): bool
     {
-        return $this->transaction(
-            fn () => $this->languages->delete($language)
-        );
+        return $this->deleteFromRepository($language);
+    }
+
+    protected function repository(): LanguageRepositoryInterface
+    {
+        return $this->languages;
+    }
+
+    protected function filterClass(): ?string
+    {
+        return LanguageFilter::class;
     }
 }

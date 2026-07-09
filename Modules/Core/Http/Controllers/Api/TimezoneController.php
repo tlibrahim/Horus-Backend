@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Http\Controllers\Api;
 
-use App\Support\Http\Controllers\BaseApiController;
-use Illuminate\Http\JsonResponse;
+use App\Support\Http\Controllers\BaseCrudController;
 use Modules\Core\Contracts\TimezoneServiceInterface;
 use Modules\Core\Http\Requests\StoreTimezoneRequest;
 use Modules\Core\Http\Requests\UpdateTimezoneRequest;
@@ -13,105 +12,47 @@ use Modules\Core\Http\Requests\UpdateTimezoneStatusRequest;
 use Modules\Core\Http\Resources\TimezoneDetailsResource;
 use Modules\Core\Http\Resources\TimezoneOptionResource;
 use Modules\Core\Http\Resources\TimezoneResource;
-use Modules\Core\Models\Timezone;
 
-final class TimezoneController extends BaseApiController
+final class TimezoneController extends BaseCrudController
 {
     public function __construct(
-        private readonly TimezoneServiceInterface $service,
-    ) {}
+        TimezoneServiceInterface $service,
+    ) {
+        parent::__construct($service);
+    }
 
-    /**
-     * Display a paginated listing.
-     */
-    public function index(): JsonResponse
+    protected function indexResource(): string
     {
-        return $this->paginated(
-            paginator: $this->service->paginate(),
-            resource: TimezoneResource::class,
-        );
+        return TimezoneResource::class;
     }
 
-    /**
-     * Display timezones for select inputs.
-     */
-    public function options(): JsonResponse
+    protected function detailResource(): string
     {
-        return $this->success(
-            data: TimezoneOptionResource::collection(
-                $this->service->options(),
-            ),
-        );
+        return TimezoneDetailsResource::class;
     }
 
-    /**
-     * Store a newly created timezone.
-     */
-    public function store(
-        StoreTimezoneRequest $request,
-    ): JsonResponse {
-        $timezone = $this->service->create(
-            $request->validated(),
-        );
-
-        return $this->created(
-            data: TimezoneDetailsResource::make($timezone),
-        );
+    protected function optionResource(): string
+    {
+        return TimezoneOptionResource::class;
     }
 
-    /**
-     * Display the specified timezone.
-     */
-    public function show(
-        Timezone $timezone,
-    ): JsonResponse {
-        return $this->success(
-            data: TimezoneDetailsResource::make($timezone),
-        );
+    protected function storeRequest(): string
+    {
+        return StoreTimezoneRequest::class;
     }
 
-    /**
-     * Update the specified timezone.
-     */
-    public function update(
-        UpdateTimezoneRequest $request,
-        Timezone $timezone,
-    ): JsonResponse {
-        $timezone = $this->service->update(
-            $timezone,
-            $request->validated(),
-        );
-
-        return $this->updated(
-            data: TimezoneDetailsResource::make($timezone),
-        );
+    protected function updateRequest(): string
+    {
+        return UpdateTimezoneRequest::class;
     }
 
-    /**
-     * Toggle the status of the specified timezone.
-     */
-    public function toggleStatus(
-        UpdateTimezoneStatusRequest $request,
-        Timezone $timezone,
-    ): JsonResponse {
-        $timezone = $this->service->toggleStatus(
-            $timezone,
-            $request->boolean('is_active'),
-        );
-
-        return $this->updated(
-            data: TimezoneDetailsResource::make($timezone),
-        );
+    protected function statusRequest(): ?string
+    {
+        return UpdateTimezoneStatusRequest::class;
     }
 
-    /**
-     * Remove the specified timezone.
-     */
-    public function destroy(
-        Timezone $timezone,
-    ): JsonResponse {
-        $this->service->delete($timezone);
-
-        return $this->deleted();
+    protected function routeParameter(): string
+    {
+        return 'timezone';
     }
 }
