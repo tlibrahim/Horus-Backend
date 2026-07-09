@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Services;
 
-use App\Support\Services\BaseService;
+use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Core\Contracts\CurrencyRepositoryInterface;
@@ -12,7 +12,7 @@ use Modules\Core\Contracts\CurrencyServiceInterface;
 use Modules\Core\Filters\CurrencyFilter;
 use Modules\Core\Models\Currency;
 
-final class CurrencyService extends BaseService implements CurrencyServiceInterface
+final class CurrencyService extends BaseCrudService implements CurrencyServiceInterface
 {
     public function __construct(
         private readonly CurrencyRepositoryInterface $currencies,
@@ -20,34 +20,29 @@ final class CurrencyService extends BaseService implements CurrencyServiceInterf
 
     public function all(): Collection
     {
-        return $this->currencies->all();
+        return $this->allFromRepository();
     }
 
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
-        return $this->currencies->paginate(
-            perPage: $perPage,
-            filter: new CurrencyFilter(request()),
-        );
+        return $this->paginateFromRepository($perPage);
     }
 
     public function options(): Collection
     {
-        return $this->currencies->options();
+        return $this->optionsFromRepository();
     }
 
     public function find(int|string $id): Currency
     {
         /** @var Currency */
-        return $this->currencies->findOrFail($id);
+        return $this->findFromRepository($id);
     }
 
     public function create(array $attributes): Currency
     {
         /** @var Currency */
-        return $this->transaction(
-            fn () => $this->currencies->create($attributes)
-        );
+        return $this->createFromRepository($attributes);
     }
 
     public function update(
@@ -55,27 +50,29 @@ final class CurrencyService extends BaseService implements CurrencyServiceInterf
         array $attributes,
     ): Currency {
         /** @var Currency */
-        return $this->transaction(
-            fn () => $this->currencies->update($currency, $attributes)
-        );
+        return $this->updateFromRepository($currency, $attributes);
     }
 
     public function toggleStatus(
         Currency $currency,
         bool $isActive,
     ): Currency {
-        return $this->transaction(function () use ($currency, $isActive) {
-            /** @var Currency */
-            return $this->currencies->update($currency, [
-                'is_active' => $isActive,
-            ]);
-        });
+        /** @var Currency */
+        return $this->toggleStatusOnRepository($currency, $isActive);
     }
 
     public function delete(Currency $currency): bool
     {
-        return $this->transaction(
-            fn () => $this->currencies->delete($currency)
-        );
+        return $this->deleteFromRepository($currency);
+    }
+
+    protected function repository(): CurrencyRepositoryInterface
+    {
+        return $this->currencies;
+    }
+
+    protected function filterClass(): ?string
+    {
+        return CurrencyFilter::class;
     }
 }

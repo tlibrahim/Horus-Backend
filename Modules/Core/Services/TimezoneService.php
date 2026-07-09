@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Services;
 
-use App\Support\Services\BaseService;
+use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Core\Contracts\TimezoneRepositoryInterface;
@@ -12,7 +12,7 @@ use Modules\Core\Contracts\TimezoneServiceInterface;
 use Modules\Core\Filters\TimezoneFilter;
 use Modules\Core\Models\Timezone;
 
-final class TimezoneService extends BaseService implements TimezoneServiceInterface
+final class TimezoneService extends BaseCrudService implements TimezoneServiceInterface
 {
     public function __construct(
         private readonly TimezoneRepositoryInterface $timezones,
@@ -20,34 +20,29 @@ final class TimezoneService extends BaseService implements TimezoneServiceInterf
 
     public function all(): Collection
     {
-        return $this->timezones->all();
+        return $this->allFromRepository();
     }
 
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
-        return $this->timezones->paginate(
-            perPage: $perPage,
-            filter: new TimezoneFilter(request()),
-        );
+        return $this->paginateFromRepository($perPage);
     }
 
     public function options(): Collection
     {
-        return $this->timezones->options();
+        return $this->optionsFromRepository();
     }
 
     public function find(int|string $id): Timezone
     {
         /** @var Timezone */
-        return $this->timezones->findOrFail($id);
+        return $this->findFromRepository($id);
     }
 
     public function create(array $attributes): Timezone
     {
         /** @var Timezone */
-        return $this->transaction(
-            fn () => $this->timezones->create($attributes)
-        );
+        return $this->createFromRepository($attributes);
     }
 
     public function update(
@@ -55,27 +50,29 @@ final class TimezoneService extends BaseService implements TimezoneServiceInterf
         array $attributes,
     ): Timezone {
         /** @var Timezone */
-        return $this->transaction(
-            fn () => $this->timezones->update($timezone, $attributes)
-        );
+        return $this->updateFromRepository($timezone, $attributes);
     }
 
     public function toggleStatus(
         Timezone $timezone,
         bool $isActive,
     ): Timezone {
-        return $this->transaction(function () use ($timezone, $isActive) {
-            /** @var Timezone */
-            return $this->timezones->update($timezone, [
-                'is_active' => $isActive,
-            ]);
-        });
+        /** @var Timezone */
+        return $this->toggleStatusOnRepository($timezone, $isActive);
     }
 
     public function delete(Timezone $timezone): bool
     {
-        return $this->transaction(
-            fn () => $this->timezones->delete($timezone)
-        );
+        return $this->deleteFromRepository($timezone);
+    }
+
+    protected function repository(): TimezoneRepositoryInterface
+    {
+        return $this->timezones;
+    }
+
+    protected function filterClass(): ?string
+    {
+        return TimezoneFilter::class;
     }
 }

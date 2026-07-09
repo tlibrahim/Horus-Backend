@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Http\Controllers\Api;
 
-use App\Support\Http\Controllers\BaseApiController;
-use Illuminate\Http\JsonResponse;
+use App\Support\Http\Controllers\BaseCrudController;
 use Modules\Core\Contracts\CountryServiceInterface;
 use Modules\Core\Http\Requests\StoreCountryRequest;
 use Modules\Core\Http\Requests\UpdateCountryRequest;
@@ -13,102 +12,47 @@ use Modules\Core\Http\Requests\UpdateCountryStatusRequest;
 use Modules\Core\Http\Resources\CountryDetailsResource;
 use Modules\Core\Http\Resources\CountryOptionResource;
 use Modules\Core\Http\Resources\CountryResource;
-use Modules\Core\Models\Country;
 
-final class CountryController extends BaseApiController
+final class CountryController extends BaseCrudController
 {
     public function __construct(
-        private readonly CountryServiceInterface $service,
-    ) {}
+        CountryServiceInterface $service,
+    ) {
+        parent::__construct($service);
+    }
 
-    /**
-     * Display a paginated listing.
-     */
-    public function index(): JsonResponse
+    protected function indexResource(): string
     {
-        return $this->paginated(
-            paginator: $this->service->paginate(),
-            resource: CountryResource::class,
-        );
+        return CountryResource::class;
     }
 
-    /**
-     * Display countries for select inputs.
-     */
-    public function options(): JsonResponse
+    protected function detailResource(): string
     {
-        return $this->success(
-            data: CountryOptionResource::collection(
-                $this->service->options(),
-            ),
-        );
+        return CountryDetailsResource::class;
     }
 
-    /**
-     * Store a newly created country.
-     */
-    public function store(StoreCountryRequest $request): JsonResponse
+    protected function optionResource(): string
     {
-        $country = $this->service->create(
-            $request->validated(),
-        );
-
-        return $this->created(
-            data: CountryDetailsResource::make($country),
-        );
+        return CountryOptionResource::class;
     }
 
-    /**
-     * Display the specified country.
-     */
-    public function show(Country $country): JsonResponse
+    protected function storeRequest(): string
     {
-        return $this->success(
-            data: CountryDetailsResource::make($country),
-        );
+        return StoreCountryRequest::class;
     }
 
-    /**
-     * Update the specified country.
-     */
-    public function update(
-        UpdateCountryRequest $request,
-        Country $country,
-    ): JsonResponse {
-        $country = $this->service->update(
-            $country,
-            $request->validated(),
-        );
-
-        return $this->success(
-            data: CountryDetailsResource::make($country),
-        );
-    }
-
-    /**
-     * Toggle the status of the specified country.
-     */
-    public function toggleStatus(
-        UpdateCountryStatusRequest $request,
-        Country $country,
-    ): JsonResponse {
-        $country = $this->service->toggleStatus(
-            $country,
-            $request->boolean('is_active'),
-        );
-
-        return $this->success(
-            data: CountryResource::make($country),
-        );
-    }
-
-    /**
-     * Remove the specified country.
-     */
-    public function destroy(Country $country): JsonResponse
+    protected function updateRequest(): string
     {
-        $this->service->delete($country);
+        return UpdateCountryRequest::class;
+    }
 
-        return $this->deleted();
+    protected function statusRequest(): ?string
+    {
+        return UpdateCountryStatusRequest::class;
+    }
+
+    protected function routeParameter(): string
+    {
+        return 'country';
     }
 }

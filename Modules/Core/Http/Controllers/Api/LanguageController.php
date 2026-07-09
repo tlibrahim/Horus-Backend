@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Http\Controllers\Api;
 
-use App\Support\Http\Controllers\BaseApiController;
-use Illuminate\Http\JsonResponse;
+use App\Support\Http\Controllers\BaseCrudController;
 use Modules\Core\Contracts\LanguageServiceInterface;
 use Modules\Core\Http\Requests\StoreLanguageRequest;
 use Modules\Core\Http\Requests\UpdateLanguageRequest;
@@ -13,105 +12,47 @@ use Modules\Core\Http\Requests\UpdateLanguageStatusRequest;
 use Modules\Core\Http\Resources\LanguageDetailsResource;
 use Modules\Core\Http\Resources\LanguageOptionResource;
 use Modules\Core\Http\Resources\LanguageResource;
-use Modules\Core\Models\Language;
 
-final class LanguageController extends BaseApiController
+final class LanguageController extends BaseCrudController
 {
     public function __construct(
-        private readonly LanguageServiceInterface $service,
-    ) {}
+        LanguageServiceInterface $service,
+    ) {
+        parent::__construct($service);
+    }
 
-    /**
-     * Display a paginated listing.
-     */
-    public function index(): JsonResponse
+    protected function indexResource(): string
     {
-        return $this->paginated(
-            paginator: $this->service->paginate(),
-            resource: LanguageResource::class,
-        );
+        return LanguageResource::class;
     }
 
-    /**
-     * Display languages for select inputs.
-     */
-    public function options(): JsonResponse
+    protected function detailResource(): string
     {
-        return $this->success(
-            data: LanguageOptionResource::collection(
-                $this->service->options(),
-            ),
-        );
+        return LanguageDetailsResource::class;
     }
 
-    /**
-     * Store a newly created language.
-     */
-    public function store(
-        StoreLanguageRequest $request,
-    ): JsonResponse {
-        $language = $this->service->create(
-            $request->validated(),
-        );
-
-        return $this->created(
-            data: LanguageDetailsResource::make($language),
-        );
+    protected function optionResource(): string
+    {
+        return LanguageOptionResource::class;
     }
 
-    /**
-     * Display the specified language.
-     */
-    public function show(
-        Language $language,
-    ): JsonResponse {
-        return $this->success(
-            data: LanguageDetailsResource::make($language),
-        );
+    protected function storeRequest(): string
+    {
+        return StoreLanguageRequest::class;
     }
 
-    /**
-     * Update the specified language.
-     */
-    public function update(
-        UpdateLanguageRequest $request,
-        Language $language,
-    ): JsonResponse {
-        $language = $this->service->update(
-            $language,
-            $request->validated(),
-        );
-
-        return $this->updated(
-            data: LanguageDetailsResource::make($language),
-        );
+    protected function updateRequest(): string
+    {
+        return UpdateLanguageRequest::class;
     }
 
-    /**
-     * Toggle the status of the specified language.
-     */
-    public function toggleStatus(
-        UpdateLanguageStatusRequest $request,
-        Language $language,
-    ): JsonResponse {
-        $language = $this->service->toggleStatus(
-            $language,
-            $request->boolean('is_active'),
-        );
-
-        return $this->updated(
-            data: LanguageDetailsResource::make($language),
-        );
+    protected function statusRequest(): ?string
+    {
+        return UpdateLanguageStatusRequest::class;
     }
 
-    /**
-     * Remove the specified language.
-     */
-    public function destroy(
-        Language $language,
-    ): JsonResponse {
-        $this->service->delete($language);
-
-        return $this->deleted();
+    protected function routeParameter(): string
+    {
+        return 'language';
     }
 }

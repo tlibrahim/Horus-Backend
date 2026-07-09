@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace Modules\Core\Contracts;
 
-use App\Support\Contracts\RepositoryInterface;
+use App\Support\Contracts\CrudRepositoryInterface;
 
-interface DistrictRepositoryInterface extends RepositoryInterface {}
+interface DistrictRepositoryInterface extends CrudRepositoryInterface {}

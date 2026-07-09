@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace Modules\Core\Contracts;
 
-use App\Support\Contracts\RepositoryInterface;
+use App\Support\Contracts\CrudRepositoryInterface;
 
-interface LanguageRepositoryInterface extends RepositoryInterface {}
+interface LanguageRepositoryInterface extends CrudRepositoryInterface {}

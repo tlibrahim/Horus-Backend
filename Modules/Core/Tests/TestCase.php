@@ -6,10 +6,14 @@ namespace Modules\Core\Tests;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
+use Modules\Tests\Traits\ApiAssertions;
+use Modules\Tests\Traits\CrudAssertions;
 use Tests\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
+    use ApiAssertions;
+    use CrudAssertions;
     use RefreshDatabase;
 
     /**
@@ -55,83 +59,6 @@ abstract class TestCase extends BaseTestCase
             $this->assertArrayHasKey($field, $errors);
             $this->assertNotEmpty($errors[$field]);
         }
-    }
-
-    /**
-     * Assert a successful API response.
-     */
-    protected function assertSuccessResponse(
-        TestResponse $response,
-        int $status = 200,
-    ): void {
-        $response
-            ->assertStatus($status)
-            ->assertJson([
-                'success' => true,
-            ])
-            ->assertJsonStructure([
-                'success',
-                'message',
-                'data',
-                'meta' => [
-                    'request_id',
-                    'timestamp',
-                    'locale',
-                    'timezone',
-                    'api_version',
-                ],
-            ]);
-    }
-
-    /**
-     * Assert a paginated API response.
-     */
-    protected function assertPaginatedResponse(
-        TestResponse $response,
-        int $status = 200,
-    ): void {
-        $this->assertSuccessResponse($response, $status);
-
-        $response->assertJsonStructure([
-            'meta' => [
-                'pagination' => [
-                    'type',
-                    'current_page',
-                    'last_page',
-                    'per_page',
-                    'total',
-                    'from',
-                    'to',
-                    'path',
-                ],
-            ],
-        ]);
-    }
-
-    /**
-     * Assert a created response.
-     */
-    protected function assertCreatedResponse(
-        TestResponse $response,
-    ): void {
-        $this->assertSuccessResponse(
-            $response,
-            201,
-        );
-    }
-
-    /**
-     * Assert a deleted response.
-     */
-    protected function assertDeletedResponse(
-        TestResponse $response,
-    ): void {
-        $this->assertSuccessResponse($response);
-
-        $response->assertJson([
-            'success' => true,
-            'data' => null,
-        ]);
     }
 
     /**
