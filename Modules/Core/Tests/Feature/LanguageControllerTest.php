@@ -226,7 +226,13 @@ final class LanguageControllerTest extends TestCase
 
     public function test_it_can_delete_language(): void
     {
-        $language = Language::query()->firstOrFail();
+        $language = Language::query()->create([
+            'name' => 'Delete Me Language',
+            'code' => 'del',
+            'direction' => 'ltr',
+            'is_default' => false,
+            'is_active' => true,
+        ]);
 
         $response = $this->deleteJson(
             route('api.v1.core.languages.destroy', $language),

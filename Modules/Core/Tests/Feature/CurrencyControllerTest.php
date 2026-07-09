@@ -229,7 +229,14 @@ final class CurrencyControllerTest extends TestCase
 
     public function test_it_can_delete_currency(): void
     {
-        $currency = Currency::query()->firstOrFail();
+        $currency = Currency::query()->create([
+            'code' => 'DEL',
+            'symbol' => 'DEL',
+            'name' => 'Delete Me Currency',
+            'currency_symbol' => 'D',
+            'is_default' => false,
+            'is_active' => true,
+        ]);
 
         $response = $this->deleteJson(
             route('api.v1.core.currencies.destroy', $currency),

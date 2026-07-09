@@ -84,8 +84,8 @@ final class TimezoneControllerTest extends TestCase
         $response = $this->postJson(
             route('api.v1.core.timezones.store'),
             $this->validTimezoneData([
-                'name' => 'Europe/Berlin',
-                'utc_offset' => '+01:00',
+                'name' => 'Pacific/Guam',
+                'utc_offset' => '+10:00',
             ]),
             $this->apiHeaders(),
         );
@@ -93,8 +93,8 @@ final class TimezoneControllerTest extends TestCase
         $this->assertSuccessResponse($response, 201);
 
         $this->assertDatabaseHas('timezones', [
-            'name' => 'Europe/Berlin',
-            'utc_offset' => '+01:00',
+            'name' => 'Pacific/Guam',
+            'utc_offset' => '+10:00',
         ]);
     }
 
