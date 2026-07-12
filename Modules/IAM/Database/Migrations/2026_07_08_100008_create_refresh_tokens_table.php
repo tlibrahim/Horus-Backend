@@ -11,16 +11,12 @@ return new class extends Migration
         Schema::create('refresh_tokens', function (Blueprint $table): void {
             $table->id();
 
-            $table->foreignId('user_id')
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->foreignId('user_id');
 
-            $table->uuid('token')->unique();
+            $table->string('token_hash', 64)->unique();
 
-            $table->foreignId('user_device_id')
-                ->nullable()
-                ->constrained()
-                ->nullOnDelete();
+            $table->foreignId('user_session_id')
+                ->nullable();
 
             $table->timestamp('expires_at');
             $table->timestamp('revoked_at')->nullable();

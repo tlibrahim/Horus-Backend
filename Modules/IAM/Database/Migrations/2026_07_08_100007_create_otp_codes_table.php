@@ -12,12 +12,10 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('user_id')
-                ->nullable()
-                ->constrained()
-                ->cascadeOnDelete();
+                ->nullable();
 
             $table->string('mobile');
-            $table->string('code', 10);
+            $table->string('code_hash')->nullable();
             $table->string('purpose');
             $table->timestamp('expires_at');
             $table->timestamp('verified_at')->nullable();

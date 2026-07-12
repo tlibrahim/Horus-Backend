@@ -12,12 +12,12 @@ class PermissionSeeder extends Seeder
         foreach (config('iam.permissions', []) as $module => $resources) {
             foreach ($resources as $resource => $actions) {
                 foreach ((array) $actions as $action) {
-                    $slug = "{$resource}.{$action}";
+                    $code = "{$module}.{$resource}.{$action}";
 
                     Permission::updateOrCreate(
-                        ['slug' => $slug],
+                        ['code' => $code],
                         [
-                            'name' => $slug,
+                            'name' => $code,
                             'group' => (string) $module,
                             'description' => null,
                         ],

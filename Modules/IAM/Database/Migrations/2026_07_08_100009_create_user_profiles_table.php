@@ -12,9 +12,7 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('user_id')
-                ->unique()
-                ->constrained()
-                ->cascadeOnDelete();
+                ->unique();
 
             $table->date('date_of_birth')->nullable();
 

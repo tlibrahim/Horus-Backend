@@ -5,12 +5,14 @@ namespace Modules\IAM\Database\Seeders\Auth;
 use Illuminate\Database\Seeder;
 use Modules\IAM\Models\RefreshToken;
 use Modules\IAM\Models\User;
-use Modules\IAM\Models\UserDevice;
+use Modules\IAM\Support\RefreshTokenManager;
 
 class RefreshTokenSeeder extends Seeder
 {
     public function run(): void
     {
+        $refreshTokenManager = app(RefreshTokenManager::class);
+
         $tokens = [
             [
                 'mobile' => '+201000000001',
@@ -31,13 +33,11 @@ class RefreshTokenSeeder extends Seeder
                 continue;
             }
 
-            $deviceId = UserDevice::query()->where('user_id', $userId)->value('id');
-
             RefreshToken::updateOrCreate(
-                ['token' => $item['token']],
+                ['token_hash' => $refreshTokenManager->hash((string) $item['token'])],
                 [
                     'user_id' => $userId,
-                    'user_device_id' => $deviceId,
+                    'user_session_id' => null,
                     'expires_at' => $item['expires_at'],
                     'revoked_at' => null,
                 ],

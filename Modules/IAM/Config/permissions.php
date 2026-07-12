@@ -16,6 +16,11 @@ return [
         'users' => ['view', 'create', 'update', 'delete'],
         'roles' => ['view', 'create', 'update', 'delete'],
         'permissions' => ['view', 'assign'],
+        'logs' => ['view'],
+        'queue' => ['view'],
+        'horizon' => ['view'],
+        'jobs' => ['view', 'retry', 'delete'],
+        'system-settings' => ['view', 'update'],
     ],
 
     'vehicle' => [

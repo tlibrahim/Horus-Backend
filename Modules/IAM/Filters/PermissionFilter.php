@@ -13,7 +13,7 @@ final class PermissionFilter extends AbstractFilter
     {
         return [
             Filter::partial('name'),
-            Filter::exact('slug'),
+            Filter::exact('code'),
             Filter::exact('group'),
         ];
     }

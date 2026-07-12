@@ -21,7 +21,7 @@ final class UpdatePermissionRequest extends PermissionRequest
         return array_merge(
             $this->commonRules(),
             [
-                'slug' => ['required', 'string', 'max:150', Rule::unique('permissions', 'slug')->ignore($permissionId)],
+                'code' => ['required', 'string', 'max:150', Rule::unique('permissions', 'code')->ignore($permissionId)],
             ],
         );
     }

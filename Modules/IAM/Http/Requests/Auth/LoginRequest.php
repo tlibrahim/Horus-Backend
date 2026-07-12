@@ -18,6 +18,8 @@ final class LoginRequest extends BaseRequest
             'device_name' => ['nullable', 'string', 'max:100'],
             'os_version' => ['nullable', 'string', 'max:50'],
             'app_version' => ['nullable', 'string', 'max:50'],
+            'browser' => ['nullable', 'string', 'max:100'],
+            'country' => ['nullable', 'string', 'size:2'],
         ];
     }
 }

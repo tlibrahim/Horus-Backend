@@ -16,7 +16,7 @@ final class PermissionOptionResource extends BaseResource
         return [
             'label' => $this->name,
             'value' => $this->id,
-            'slug' => $this->slug,
+            'code' => $this->code,
         ];
     }
 }

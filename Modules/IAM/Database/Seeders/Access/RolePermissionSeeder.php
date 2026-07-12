@@ -23,5 +23,22 @@ class RolePermissionSeeder extends Seeder
         $superAdmin->permissions()->sync(
             Permission::query()->pluck('id')->all(),
         );
+
+        foreach ((array) config('iam.role_permissions', []) as $roleName => $permissionCodes) {
+            $role = Role::query()
+                ->where('name', (string) $roleName)
+                ->first();
+
+            if ($role === null) {
+                continue;
+            }
+
+            $permissionIds = Permission::query()
+                ->whereIn('code', (array) $permissionCodes)
+                ->pluck('id')
+                ->all();
+
+            $role->permissions()->sync($permissionIds);
+        }
     }
 }

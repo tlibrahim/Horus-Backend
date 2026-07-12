@@ -15,7 +15,7 @@ abstract class PermissionRequest extends BaseRequest
 
         $this->merge([
             'name' => $name,
-            'slug' => trim((string) $this->input('slug', $name)),
+            'code' => trim((string) $this->input('code', $name)),
             'group' => Str::lower(trim((string) $this->input('group'))),
             'description' => $this->input('description') !== null
                 ? trim((string) $this->input('description'))
@@ -27,7 +27,7 @@ abstract class PermissionRequest extends BaseRequest
     {
         return [
             'name' => ['required', 'string', 'max:150'],
-            'slug' => ['required', 'string', 'max:150'],
+            'code' => ['required', 'string', 'max:150'],
             'group' => ['required', 'string', 'max:100'],
             'description' => ['nullable', 'string'],
         ];
