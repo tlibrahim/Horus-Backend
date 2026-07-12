@@ -13,15 +13,20 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
 
-            $table->string('first_name', 100);
-            $table->string('last_name', 100);
-            $table->string('display_name', 200)->nullable();
+            $table->string('first_name', 50);
+            $table->string('last_name', 50);
+            $table->string('display_name', 100)->nullable();
+            $table->string('full_name', 100)->nullable();
 
             $table->string('email')->nullable()->unique();
             $table->string('mobile', 30)->unique();
 
             // Nullable because users will register via OTP first.
             $table->string('password')->nullable();
+
+            $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('mobile_verified_at')->nullable();
+            $table->boolean('is_verified')->default(false);
 
             $table->string('avatar')->nullable();
 
@@ -40,12 +45,8 @@ return new class extends Migration
                 ->constrained('timezones')
                 ->nullOnDelete();
 
-            $table->timestamp('email_verified_at')->nullable();
-            $table->timestamp('mobile_verified_at')->nullable();
-
             $table->timestamp('last_login_at')->nullable();
 
-            $table->boolean('is_verified')->default(false);
             $table->boolean('is_active')->default(true);
 
             $table->rememberToken();
@@ -56,6 +57,7 @@ return new class extends Migration
             $table->index(['mobile']);
             $table->index(['email']);
             $table->index(['is_active']);
+            $table->index(['is_verified']);
             $table->index(['country_id']);
         });
     }

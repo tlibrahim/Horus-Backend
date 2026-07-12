@@ -86,7 +86,10 @@ final class AccessTokenManager
 
     private static function key(): string
     {
-        return (string) config('app.key', 'iam-access-token-key');
+        return (string) (
+            config('iam.auth.jwt_secret')
+            ?? config('app.key', 'iam-access-token-key')
+        );
     }
 
     private static function base64UrlEncode(string $value): string

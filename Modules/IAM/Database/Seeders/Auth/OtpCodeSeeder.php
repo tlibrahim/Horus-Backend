@@ -3,6 +3,7 @@
 namespace Modules\IAM\Database\Seeders\Auth;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Modules\IAM\Models\OtpCode;
 use Modules\IAM\Models\User;
 
@@ -39,7 +40,7 @@ class OtpCodeSeeder extends Seeder
                 ],
                 [
                     'user_id' => $userId,
-                    'code' => $record['code'],
+                    'code_hash' => Hash::make((string) $record['code']),
                     'expires_at' => $record['expires_at'],
                     'verified_at' => $record['verified_at'],
                     'attempts' => $record['attempts'],

@@ -19,8 +19,8 @@ class RefreshToken extends BaseModel
         return $this->belongsTo(User::class);
     }
 
-    public function userDevice(): BelongsTo
+    public function userSession(): BelongsTo
     {
-        return $this->belongsTo(UserDevice::class);
+        return $this->belongsTo(UserSession::class);
     }
 }

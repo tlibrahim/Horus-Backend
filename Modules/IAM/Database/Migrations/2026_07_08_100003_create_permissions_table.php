@@ -12,9 +12,10 @@ return new class extends Migration
 
             $table->id();
             $table->string('name', 150);
-            $table->string('slug', 150)->unique();
+            $table->string('code', 150)->unique();
             $table->string('group', 100);
             $table->text('description')->nullable();
+            $table->boolean('is_system')->default(false);
 
             $table->timestamps();
             $table->index('group');

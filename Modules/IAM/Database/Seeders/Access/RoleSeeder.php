@@ -10,20 +10,26 @@ class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        foreach (config('iam.roles', []) as $name) {
-            $name = trim((string) $name);
+        foreach (config('iam.roles', []) as $role) {
+            $role = is_array($role)
+                ? $role
+                : ['name' => (string) $role];
+
+            $name = trim((string) data_get($role, 'name', ''));
 
             if ($name === '') {
                 continue;
             }
 
+            $slug = trim((string) data_get($role, 'slug', ''));
+
             Role::updateOrCreate(
                 ['name' => $name],
                 [
-                    'slug' => Str::slug($name),
-                    'description' => null,
-                    'is_system' => true,
-                    'is_active' => true,
+                    'slug' => $slug !== '' ? $slug : Str::slug($name),
+                    'description' => data_get($role, 'description'),
+                    'is_system' => (bool) data_get($role, 'is_system', true),
+                    'is_active' => (bool) data_get($role, 'is_active', true),
                 ],
             );
         }

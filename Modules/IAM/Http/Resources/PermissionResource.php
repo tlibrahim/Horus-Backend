@@ -16,7 +16,7 @@ final class PermissionResource extends BaseResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'slug' => $this->slug,
+            'code' => $this->code,
             'group' => $this->group,
             'description' => $this->description,
             'created_at' => $this->formatDate($this->created_at),

@@ -18,7 +18,7 @@ final class StorePermissionRequest extends PermissionRequest
         return array_merge(
             $this->commonRules(),
             [
-                'slug' => ['required', 'string', 'max:150', Rule::unique('permissions', 'slug')],
+                'code' => ['required', 'string', 'max:150', Rule::unique('permissions', 'code')],
             ],
         );
     }

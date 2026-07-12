@@ -43,7 +43,7 @@ abstract class TestCase extends BaseTestCase
     {
         return array_merge([
             'name' => 'roles.export',
-            'slug' => 'roles.export',
+            'code' => 'roles.export',
             'group' => 'iam',
             'description' => 'Can export roles',
         ], $overrides);

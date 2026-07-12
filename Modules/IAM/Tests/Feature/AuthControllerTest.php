@@ -55,7 +55,6 @@ final class AuthControllerTest extends TestCase
         $otp = OtpCode::query()->create([
             'user_id' => $user->id,
             'mobile' => $user->mobile,
-            'code' => '******',
             'code_hash' => Hash::make('123456'),
             'purpose' => 'register',
             'expires_at' => now()->addMinutes(10),
@@ -153,16 +152,18 @@ final class AuthControllerTest extends TestCase
             'is_active' => true,
         ]);
 
+        $plainRefreshToken = '22222222-2222-2222-2222-222222222222';
+
         $token = RefreshToken::query()->create([
             'user_id' => $user->id,
-            'token' => '22222222-2222-2222-2222-222222222222',
+            'token_hash' => hash('sha256', $plainRefreshToken),
             'expires_at' => now()->addDays(30),
         ]);
 
         $response = $this->postJson(
             route('api.v1.iam.auth.refresh'),
             [
-                'refresh_token' => $token->token,
+                'refresh_token' => $plainRefreshToken,
             ],
             $this->apiHeaders(),
         );
@@ -184,15 +185,17 @@ final class AuthControllerTest extends TestCase
             'is_active' => true,
         ]);
 
+        $plainRefreshToken = '33333333-3333-3333-3333-333333333333';
+
         $token = RefreshToken::query()->create([
             'user_id' => $user->id,
-            'token' => '33333333-3333-3333-3333-333333333333',
+            'token_hash' => hash('sha256', $plainRefreshToken),
             'expires_at' => now()->addDays(30),
         ]);
 
         $accessToken = AccessTokenManager::issue(
             userId: (int) $user->id,
-            refreshToken: $token->token,
+            refreshToken: $plainRefreshToken,
         );
 
         $response = $this->postJson(
@@ -220,20 +223,24 @@ final class AuthControllerTest extends TestCase
             'is_active' => true,
         ]);
 
+        $firstPlainRefreshToken = '44444444-4444-4444-4444-444444444444';
+
         $token = RefreshToken::query()->create([
             'user_id' => $user->id,
-            'token' => '44444444-4444-4444-4444-444444444444',
+            'token_hash' => hash('sha256', $firstPlainRefreshToken),
             'expires_at' => now()->addDays(30),
         ]);
 
         $accessToken = AccessTokenManager::issue(
             userId: (int) $user->id,
-            refreshToken: $token->token,
+            refreshToken: $firstPlainRefreshToken,
         );
+
+        $secondPlainRefreshToken = '55555555-5555-5555-5555-555555555555';
 
         RefreshToken::query()->create([
             'user_id' => $user->id,
-            'token' => '55555555-5555-5555-5555-555555555555',
+            'token_hash' => hash('sha256', $secondPlainRefreshToken),
             'expires_at' => now()->addDays(30),
         ]);
 
@@ -299,7 +306,6 @@ final class AuthControllerTest extends TestCase
         $otp = OtpCode::query()->create([
             'user_id' => $user->id,
             'mobile' => $user->mobile,
-            'code' => '******',
             'code_hash' => Hash::make('654321'),
             'purpose' => 'forgot_password',
             'expires_at' => now()->addMinutes(10),
@@ -337,15 +343,17 @@ final class AuthControllerTest extends TestCase
             'is_active' => true,
         ]);
 
+        $plainRefreshToken = '66666666-6666-6666-6666-666666666666';
+
         $token = RefreshToken::query()->create([
             'user_id' => $user->id,
-            'token' => '66666666-6666-6666-6666-666666666666',
+            'token_hash' => hash('sha256', $plainRefreshToken),
             'expires_at' => now()->addDays(30),
         ]);
 
         $accessToken = AccessTokenManager::issue(
             userId: (int) $user->id,
-            refreshToken: $token->token,
+            refreshToken: $plainRefreshToken,
         );
 
         $response = $this->postJson(
@@ -379,15 +387,17 @@ final class AuthControllerTest extends TestCase
             'is_active' => true,
         ]);
 
+        $plainRefreshToken = '77777777-7777-7777-7777-777777777777';
+
         $token = RefreshToken::query()->create([
             'user_id' => $user->id,
-            'token' => '77777777-7777-7777-7777-777777777777',
+            'token_hash' => hash('sha256', $plainRefreshToken),
             'expires_at' => now()->addDays(30),
         ]);
 
         $accessToken = AccessTokenManager::issue(
             userId: (int) $user->id,
-            refreshToken: $token->token,
+            refreshToken: $plainRefreshToken,
         );
 
         $response = $this->getJson(

@@ -60,7 +60,7 @@ final class PermissionControllerTest extends TestCase
             route('api.v1.iam.permissions.store'),
             $this->validPermissionData([
                 'name' => 'reports.view',
-                'slug' => 'reports.view',
+                'code' => 'reports.view',
             ]),
             $this->apiHeaders(),
         );
@@ -68,7 +68,7 @@ final class PermissionControllerTest extends TestCase
         $this->assertSuccessResponse($response, 201);
 
         $this->assertDatabaseHas('permissions', [
-            'slug' => 'reports.view',
+            'code' => 'reports.view',
             'group' => 'iam',
         ]);
     }
@@ -83,7 +83,7 @@ final class PermissionControllerTest extends TestCase
 
         $this->assertValidationResponse($response, [
             'name',
-            'slug',
+            'code',
             'group',
         ]);
     }
@@ -96,7 +96,7 @@ final class PermissionControllerTest extends TestCase
             route('api.v1.iam.permissions.update', $permission),
             $this->validPermissionData([
                 'name' => 'roles.audit',
-                'slug' => 'roles.audit',
+                'code' => 'roles.audit',
                 'group' => 'iam',
             ]),
             $this->apiHeaders(),
@@ -106,7 +106,7 @@ final class PermissionControllerTest extends TestCase
 
         $this->assertDatabaseHas('permissions', [
             'id' => $permission->id,
-            'slug' => 'roles.audit',
+            'code' => 'roles.audit',
         ]);
     }
 
@@ -115,7 +115,7 @@ final class PermissionControllerTest extends TestCase
         $permission = Permission::query()->create(
             $this->validPermissionData([
                 'name' => 'temporary.permission',
-                'slug' => 'temporary.permission',
+                'code' => 'temporary.permission',
             ]),
         );
 

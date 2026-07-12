@@ -38,7 +38,7 @@ final class IamAuthenticate
 
         $refreshToken = RefreshToken::query()
             ->with('user')
-            ->where('token', $payload['refresh_token'])
+            ->where('token_hash', hash('sha256', $payload['refresh_token']))
             ->where('user_id', $payload['user_id'])
             ->whereNull('revoked_at')
             ->where('expires_at', '>', now())
@@ -59,6 +59,7 @@ final class IamAuthenticate
         );
 
         $request->attributes->set('iam_refresh_token', $refreshToken);
+        $request->attributes->set('iam_access_refresh_token', $payload['refresh_token']);
 
         return $next($request);
     }
