@@ -13,6 +13,7 @@ use Modules\Vehicle\Http\Controllers\Api\Catalog\TransmissionController;
 use Modules\Vehicle\Http\Controllers\Api\Catalog\VehicleModelController;
 use Modules\Vehicle\Http\Controllers\Api\Catalog\VehicleTypeController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleController;
+use Modules\Vehicle\Http\Controllers\Api\VehicleImageController;
 
 Route::prefix('api/v1/vehicle')
     ->middleware('api')
@@ -117,13 +118,53 @@ Route::prefix('api/v1/vehicle')
 
         Route::prefix('vehicles')
             ->name('vehicles.')
-            ->controller(VehicleController::class)
             ->group(function (): void {
-                Route::get('/', 'index')->name('index');
-                Route::get('/options', 'options')->name('options');
-                Route::post('/', 'store')->name('store');
-                Route::get('/{vehicle}', 'show')->name('show');
-                Route::put('/{vehicle}', 'update')->name('update');
-                Route::delete('/{vehicle}', 'destroy')->name('destroy');
+                /*
+                |--------------------------------------------------------------------------
+                | Vehicle CRUD
+                |--------------------------------------------------------------------------
+                */
+
+                Route::controller(VehicleController::class)
+                    ->group(function (): void {
+
+                        Route::get('/', 'index')->name('index');
+                        Route::get('/options', 'options')->name('options');
+                        Route::post('/', 'store')->name('store');
+                        Route::get('/{vehicle}', 'show')->name('show');
+                        Route::put('/{vehicle}', 'update')->name('update');
+                        Route::delete('/{vehicle}', 'destroy')->name('destroy');
+                    });
+
+                /*
+                |--------------------------------------------------------------------------
+                | Vehicle Images
+                |--------------------------------------------------------------------------
+                */
+
+                Route::controller(VehicleImageController::class)
+                    ->prefix('{vehicle}/images')
+                    ->name('images.')
+                    ->group(function (): void {
+
+                        Route::get('/', 'index')->name('index');
+
+                        Route::post('/', 'store')->name('store');
+                    });
+            });
+
+        Route::prefix('vehicle-images')
+            ->name('vehicle-images.')
+            ->controller(VehicleImageController::class)
+            ->group(function (): void {
+
+                Route::get('/{vehicleImage}', 'show')->name('show');
+
+                Route::patch('/{vehicleImage}', 'update')->name('update');
+
+                Route::delete('/{vehicleImage}', 'destroy')->name('destroy');
+
+                Route::patch('/{vehicleImage}/primary', 'setPrimary')
+                    ->name('set-primary');
             });
     });
