@@ -35,9 +35,6 @@ abstract class BaseRepository implements CrudRepositoryInterface
         array $columns = ['*'],
         ?FilterInterface $filter = null,
     ): Collection {
-        // return $this->query()
-        //     ->filter($filter)
-        //     ->get($columns);
 
         $query = $this->query();
 
@@ -110,9 +107,7 @@ abstract class BaseRepository implements CrudRepositoryInterface
         array $columns = ['id', 'name'],
         ?FilterInterface $filter = null,
     ): Collection {
-        // return $this->query()
-        //     ->filter($filter)
-        //     ->get($columns);
+
         $query = $this->query();
 
         if ($filter !== null) {
