@@ -10,6 +10,7 @@ use Modules\Vehicle\Http\Controllers\Api\EngineController;
 use Modules\Vehicle\Http\Controllers\Api\FuelTypeController;
 use Modules\Vehicle\Http\Controllers\Api\GenerationController;
 use Modules\Vehicle\Http\Controllers\Api\TransmissionController;
+use Modules\Vehicle\Http\Controllers\Api\VehicleController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleModelController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleTypeController;
 
@@ -112,5 +113,17 @@ Route::prefix('api/v1/vehicle')
                 Route::get('/', 'index')->name('index');
                 Route::get('/options', 'options')->name('options');
                 Route::get('/{vehicleType}', 'show')->name('show');
+            });
+
+        Route::prefix('vehicles')
+            ->name('vehicles.')
+            ->controller(VehicleController::class)
+            ->group(function (): void {
+                Route::get('/', 'index')->name('index');
+                Route::get('/options', 'options')->name('options');
+                Route::post('/', 'store')->name('store');
+                Route::get('/{vehicle}', 'show')->name('show');
+                Route::put('/{vehicle}', 'update')->name('update');
+                Route::delete('/{vehicle}', 'destroy')->name('destroy');
             });
     });

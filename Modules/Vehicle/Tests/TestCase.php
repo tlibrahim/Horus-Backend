@@ -7,6 +7,7 @@ namespace Modules\Vehicle\Tests;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Core\Database\Seeders\CoreDatabaseSeeder;
 use Modules\Core\Models\Country;
+use Modules\IAM\Database\Seeders\IAMDatabaseSeeder;
 use Modules\Tests\Traits\ApiAssertions;
 use Modules\Vehicle\Database\Seeders\VehicleDatabaseSeeder;
 use Modules\Vehicle\Models\Brand;
@@ -22,6 +23,7 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         $this->seed(CoreDatabaseSeeder::class);
+        $this->seed(IAMDatabaseSeeder::class);
         $this->seed(VehicleDatabaseSeeder::class);
     }
 
