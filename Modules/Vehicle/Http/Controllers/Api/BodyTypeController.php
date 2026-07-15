@@ -6,10 +6,10 @@ namespace Modules\Vehicle\Http\Controllers\Api;
 
 use App\Support\Http\Controllers\BaseApiController;
 use Illuminate\Http\JsonResponse;
-use Modules\Vehicle\Contracts\BodyTypeServiceInterface;
-use Modules\Vehicle\Http\Resources\BodyTypeDetailsResource;
-use Modules\Vehicle\Http\Resources\BodyTypeOptionResource;
-use Modules\Vehicle\Http\Resources\BodyTypeResource;
+use Modules\Vehicle\Contracts\BodyType\BodyTypeServiceInterface;
+use Modules\Vehicle\Http\Resources\BodyType\BodyTypeDetailsResource;
+use Modules\Vehicle\Http\Resources\BodyType\BodyTypeOptionResource;
+use Modules\Vehicle\Http\Resources\BodyType\BodyTypeResource;
 use Modules\Vehicle\Models\BodyType;
 
 final class BodyTypeController extends BaseApiController

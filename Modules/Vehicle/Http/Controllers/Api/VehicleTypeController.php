@@ -6,10 +6,10 @@ namespace Modules\Vehicle\Http\Controllers\Api;
 
 use App\Support\Http\Controllers\BaseApiController;
 use Illuminate\Http\JsonResponse;
-use Modules\Vehicle\Contracts\VehicleTypeServiceInterface;
-use Modules\Vehicle\Http\Resources\VehicleTypeDetailsResource;
-use Modules\Vehicle\Http\Resources\VehicleTypeOptionResource;
-use Modules\Vehicle\Http\Resources\VehicleTypeResource;
+use Modules\Vehicle\Contracts\VehicleType\VehicleTypeServiceInterface;
+use Modules\Vehicle\Http\Resources\VehicleType\VehicleTypeDetailsResource;
+use Modules\Vehicle\Http\Resources\VehicleType\VehicleTypeOptionResource;
+use Modules\Vehicle\Http\Resources\VehicleType\VehicleTypeResource;
 use Modules\Vehicle\Models\VehicleType;
 
 final class VehicleTypeController extends BaseApiController

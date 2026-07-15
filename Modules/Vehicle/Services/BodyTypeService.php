@@ -7,8 +7,8 @@ namespace Modules\Vehicle\Services;
 use App\Support\Services\BaseService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Modules\Vehicle\Contracts\BodyTypeRepositoryInterface;
-use Modules\Vehicle\Contracts\BodyTypeServiceInterface;
+use Modules\Vehicle\Contracts\BodyType\BodyTypeRepositoryInterface;
+use Modules\Vehicle\Contracts\BodyType\BodyTypeServiceInterface;
 use Modules\Vehicle\Filters\BodyTypeFilter;
 use Modules\Vehicle\Models\BodyType;
 

@@ -6,10 +6,10 @@ namespace Modules\Vehicle\Http\Controllers\Api;
 
 use App\Support\Http\Controllers\BaseApiController;
 use Illuminate\Http\JsonResponse;
-use Modules\Vehicle\Contracts\DriveTypeServiceInterface;
-use Modules\Vehicle\Http\Resources\DriveTypeDetailsResource;
-use Modules\Vehicle\Http\Resources\DriveTypeOptionResource;
-use Modules\Vehicle\Http\Resources\DriveTypeResource;
+use Modules\Vehicle\Contracts\DriveType\DriveTypeServiceInterface;
+use Modules\Vehicle\Http\Resources\DriveType\DriveTypeDetailsResource;
+use Modules\Vehicle\Http\Resources\DriveType\DriveTypeOptionResource;
+use Modules\Vehicle\Http\Resources\DriveType\DriveTypeResource;
 use Modules\Vehicle\Models\DriveType;
 
 final class DriveTypeController extends BaseApiController

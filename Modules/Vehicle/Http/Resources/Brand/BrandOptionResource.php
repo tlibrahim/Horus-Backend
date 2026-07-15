@@ -1,0 +1,23 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\Vehicle\Http\Resources\Brand;
+
+use App\Support\Http\Resources\BaseResource;
+use Illuminate\Http\Request;
+use Modules\Vehicle\Models\Brand;
+
+/**
+ * @mixin Brand
+ */
+final class BrandOptionResource extends BaseResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'label' => $this->name,
+            'value' => $this->id,
+        ];
+    }
+}

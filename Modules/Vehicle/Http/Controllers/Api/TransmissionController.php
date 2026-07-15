@@ -6,10 +6,10 @@ namespace Modules\Vehicle\Http\Controllers\Api;
 
 use App\Support\Http\Controllers\BaseApiController;
 use Illuminate\Http\JsonResponse;
-use Modules\Vehicle\Contracts\TransmissionServiceInterface;
-use Modules\Vehicle\Http\Resources\TransmissionDetailsResource;
-use Modules\Vehicle\Http\Resources\TransmissionOptionResource;
-use Modules\Vehicle\Http\Resources\TransmissionResource;
+use Modules\Vehicle\Contracts\Transmission\TransmissionServiceInterface;
+use Modules\Vehicle\Http\Resources\Transmission\TransmissionDetailsResource;
+use Modules\Vehicle\Http\Resources\Transmission\TransmissionOptionResource;
+use Modules\Vehicle\Http\Resources\Transmission\TransmissionResource;
 use Modules\Vehicle\Models\Transmission;
 
 final class TransmissionController extends BaseApiController
