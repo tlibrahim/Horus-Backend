@@ -3,16 +3,16 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use Modules\Vehicle\Http\Controllers\Api\BodyTypeController;
-use Modules\Vehicle\Http\Controllers\Api\BrandController;
-use Modules\Vehicle\Http\Controllers\Api\DriveTypeController;
-use Modules\Vehicle\Http\Controllers\Api\EngineController;
-use Modules\Vehicle\Http\Controllers\Api\FuelTypeController;
-use Modules\Vehicle\Http\Controllers\Api\GenerationController;
-use Modules\Vehicle\Http\Controllers\Api\TransmissionController;
+use Modules\Vehicle\Http\Controllers\Api\Catalog\BodyTypeController;
+use Modules\Vehicle\Http\Controllers\Api\Catalog\BrandController;
+use Modules\Vehicle\Http\Controllers\Api\Catalog\DriveTypeController;
+use Modules\Vehicle\Http\Controllers\Api\Catalog\EngineController;
+use Modules\Vehicle\Http\Controllers\Api\Catalog\FuelTypeController;
+use Modules\Vehicle\Http\Controllers\Api\Catalog\GenerationController;
+use Modules\Vehicle\Http\Controllers\Api\Catalog\TransmissionController;
+use Modules\Vehicle\Http\Controllers\Api\Catalog\VehicleModelController;
+use Modules\Vehicle\Http\Controllers\Api\Catalog\VehicleTypeController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleController;
-use Modules\Vehicle\Http\Controllers\Api\VehicleModelController;
-use Modules\Vehicle\Http\Controllers\Api\VehicleTypeController;
 
 Route::prefix('api/v1/vehicle')
     ->middleware('api')

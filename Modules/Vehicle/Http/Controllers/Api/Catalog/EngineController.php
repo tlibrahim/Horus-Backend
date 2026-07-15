@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Modules\Vehicle\Http\Controllers\Api;
+namespace Modules\Vehicle\Http\Controllers\Api\Catalog;
 
 use App\Support\Http\Controllers\BaseCrudController;
 use Modules\Vehicle\Contracts\Engine\EngineServiceInterface;
