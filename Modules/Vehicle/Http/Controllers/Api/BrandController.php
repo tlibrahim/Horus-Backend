@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Modules\Vehicle\Http\Controllers\Api;
 
 use App\Support\Http\Controllers\BaseCrudController;
-use Modules\Vehicle\Contracts\BrandServiceInterface;
-use Modules\Vehicle\Http\Requests\StoreBrandRequest;
-use Modules\Vehicle\Http\Requests\UpdateBrandRequest;
-use Modules\Vehicle\Http\Requests\UpdateBrandStatusRequest;
-use Modules\Vehicle\Http\Resources\BrandDetailsResource;
-use Modules\Vehicle\Http\Resources\BrandOptionResource;
-use Modules\Vehicle\Http\Resources\BrandResource;
+use Modules\Vehicle\Contracts\Brand\BrandServiceInterface;
+use Modules\Vehicle\Http\Requests\Brand\StoreBrandRequest;
+use Modules\Vehicle\Http\Requests\Brand\UpdateBrandRequest;
+use Modules\Vehicle\Http\Requests\Brand\UpdateBrandStatusRequest;
+use Modules\Vehicle\Http\Resources\Brand\BrandDetailsResource;
+use Modules\Vehicle\Http\Resources\Brand\BrandOptionResource;
+use Modules\Vehicle\Http\Resources\Brand\BrandResource;
 
 final class BrandController extends BaseCrudController
 {

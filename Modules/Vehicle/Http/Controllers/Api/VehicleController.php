@@ -6,12 +6,12 @@ namespace Modules\Vehicle\Http\Controllers\Api;
 
 use App\Support\Http\Controllers\BaseApiController;
 use Illuminate\Http\JsonResponse;
-use Modules\Vehicle\Contracts\VehicleServiceInterface;
-use Modules\Vehicle\Http\Requests\StoreVehicleRequest;
-use Modules\Vehicle\Http\Requests\UpdateVehicleRequest;
-use Modules\Vehicle\Http\Resources\VehicleDetailsResource;
-use Modules\Vehicle\Http\Resources\VehicleOptionResource;
-use Modules\Vehicle\Http\Resources\VehicleResource;
+use Modules\Vehicle\Contracts\Vehicle\VehicleServiceInterface;
+use Modules\Vehicle\Http\Requests\Vehicle\StoreVehicleRequest;
+use Modules\Vehicle\Http\Requests\Vehicle\UpdateVehicleRequest;
+use Modules\Vehicle\Http\Resources\Vehicle\VehicleDetailsResource;
+use Modules\Vehicle\Http\Resources\Vehicle\VehicleOptionResource;
+use Modules\Vehicle\Http\Resources\Vehicle\VehicleResource;
 use Modules\Vehicle\Models\Vehicle;
 use Symfony\Component\HttpFoundation\Response;
 

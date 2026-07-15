@@ -7,8 +7,8 @@ namespace Modules\Vehicle\Services;
 use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Modules\Vehicle\Contracts\GenerationRepositoryInterface;
-use Modules\Vehicle\Contracts\GenerationServiceInterface;
+use Modules\Vehicle\Contracts\Generation\GenerationRepositoryInterface;
+use Modules\Vehicle\Contracts\Generation\GenerationServiceInterface;
 use Modules\Vehicle\Filters\GenerationFilter;
 use Modules\Vehicle\Models\Generation;
 

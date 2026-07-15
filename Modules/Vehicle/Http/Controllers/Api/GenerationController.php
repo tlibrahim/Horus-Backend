@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Modules\Vehicle\Http\Controllers\Api;
 
 use App\Support\Http\Controllers\BaseCrudController;
-use Modules\Vehicle\Contracts\GenerationServiceInterface;
-use Modules\Vehicle\Http\Requests\StoreGenerationRequest;
-use Modules\Vehicle\Http\Requests\UpdateGenerationRequest;
-use Modules\Vehicle\Http\Requests\UpdateGenerationStatusRequest;
-use Modules\Vehicle\Http\Resources\GenerationDetailsResource;
-use Modules\Vehicle\Http\Resources\GenerationOptionResource;
-use Modules\Vehicle\Http\Resources\GenerationResource;
+use Modules\Vehicle\Contracts\Generation\GenerationServiceInterface;
+use Modules\Vehicle\Http\Requests\Generation\StoreGenerationRequest;
+use Modules\Vehicle\Http\Requests\Generation\UpdateGenerationRequest;
+use Modules\Vehicle\Http\Requests\Generation\UpdateGenerationStatusRequest;
+use Modules\Vehicle\Http\Resources\Generation\GenerationDetailsResource;
+use Modules\Vehicle\Http\Resources\Generation\GenerationOptionResource;
+use Modules\Vehicle\Http\Resources\Generation\GenerationResource;
 
 final class GenerationController extends BaseCrudController
 {

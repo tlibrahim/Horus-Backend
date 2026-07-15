@@ -6,10 +6,10 @@ namespace Modules\Vehicle\Http\Controllers\Api;
 
 use App\Support\Http\Controllers\BaseApiController;
 use Illuminate\Http\JsonResponse;
-use Modules\Vehicle\Contracts\FuelTypeServiceInterface;
-use Modules\Vehicle\Http\Resources\FuelTypeDetailsResource;
-use Modules\Vehicle\Http\Resources\FuelTypeOptionResource;
-use Modules\Vehicle\Http\Resources\FuelTypeResource;
+use Modules\Vehicle\Contracts\FuelType\FuelTypeServiceInterface;
+use Modules\Vehicle\Http\Resources\FuelType\FuelTypeDetailsResource;
+use Modules\Vehicle\Http\Resources\FuelType\FuelTypeOptionResource;
+use Modules\Vehicle\Http\Resources\FuelType\FuelTypeResource;
 use Modules\Vehicle\Models\FuelType;
 
 final class FuelTypeController extends BaseApiController

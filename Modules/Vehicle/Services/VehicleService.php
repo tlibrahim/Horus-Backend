@@ -8,8 +8,8 @@ use App\Support\Contracts\CrudRepositoryInterface;
 use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Modules\Vehicle\Contracts\VehicleRepositoryInterface;
-use Modules\Vehicle\Contracts\VehicleServiceInterface;
+use Modules\Vehicle\Contracts\Vehicle\VehicleRepositoryInterface;
+use Modules\Vehicle\Contracts\Vehicle\VehicleServiceInterface;
 use Modules\Vehicle\Models\Vehicle;
 
 class VehicleService extends BaseCrudService implements VehicleServiceInterface

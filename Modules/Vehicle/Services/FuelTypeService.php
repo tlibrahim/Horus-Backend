@@ -7,8 +7,8 @@ namespace Modules\Vehicle\Services;
 use App\Support\Services\BaseService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Modules\Vehicle\Contracts\FuelTypeRepositoryInterface;
-use Modules\Vehicle\Contracts\FuelTypeServiceInterface;
+use Modules\Vehicle\Contracts\FuelType\FuelTypeRepositoryInterface;
+use Modules\Vehicle\Contracts\FuelType\FuelTypeServiceInterface;
 use Modules\Vehicle\Filters\FuelTypeFilter;
 use Modules\Vehicle\Models\FuelType;
 

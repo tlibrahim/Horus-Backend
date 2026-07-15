@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Modules\Vehicle\Http\Controllers\Api;
 
 use App\Support\Http\Controllers\BaseCrudController;
-use Modules\Vehicle\Contracts\VehicleModelServiceInterface;
-use Modules\Vehicle\Http\Requests\StoreVehicleModelRequest;
-use Modules\Vehicle\Http\Requests\UpdateVehicleModelRequest;
-use Modules\Vehicle\Http\Requests\UpdateVehicleModelStatusRequest;
-use Modules\Vehicle\Http\Resources\VehicleModelDetailsResource;
-use Modules\Vehicle\Http\Resources\VehicleModelOptionResource;
-use Modules\Vehicle\Http\Resources\VehicleModelResource;
+use Modules\Vehicle\Contracts\VehicleModel\VehicleModelServiceInterface;
+use Modules\Vehicle\Http\Requests\VehicleModel\StoreVehicleModelRequest;
+use Modules\Vehicle\Http\Requests\VehicleModel\UpdateVehicleModelRequest;
+use Modules\Vehicle\Http\Requests\VehicleModel\UpdateVehicleModelStatusRequest;
+use Modules\Vehicle\Http\Resources\VehicleModel\VehicleModelDetailsResource;
+use Modules\Vehicle\Http\Resources\VehicleModel\VehicleModelOptionResource;
+use Modules\Vehicle\Http\Resources\VehicleModel\VehicleModelResource;
 
 final class VehicleModelController extends BaseCrudController
 {
