@@ -21,6 +21,8 @@ use Modules\Vehicle\Contracts\TransmissionRepositoryInterface;
 use Modules\Vehicle\Contracts\TransmissionServiceInterface;
 use Modules\Vehicle\Contracts\VehicleModelRepositoryInterface;
 use Modules\Vehicle\Contracts\VehicleModelServiceInterface;
+use Modules\Vehicle\Contracts\VehicleRepositoryInterface;
+use Modules\Vehicle\Contracts\VehicleServiceInterface;
 use Modules\Vehicle\Contracts\VehicleTypeRepositoryInterface;
 use Modules\Vehicle\Contracts\VehicleTypeServiceInterface;
 use Modules\Vehicle\Repositories\BodyTypeRepository;
@@ -31,6 +33,7 @@ use Modules\Vehicle\Repositories\FuelTypeRepository;
 use Modules\Vehicle\Repositories\GenerationRepository;
 use Modules\Vehicle\Repositories\TransmissionRepository;
 use Modules\Vehicle\Repositories\VehicleModelRepository;
+use Modules\Vehicle\Repositories\VehicleRepository;
 use Modules\Vehicle\Repositories\VehicleTypeRepository;
 use Modules\Vehicle\Services\BodyTypeService;
 use Modules\Vehicle\Services\BrandService;
@@ -40,6 +43,7 @@ use Modules\Vehicle\Services\FuelTypeService;
 use Modules\Vehicle\Services\GenerationService;
 use Modules\Vehicle\Services\TransmissionService;
 use Modules\Vehicle\Services\VehicleModelService;
+use Modules\Vehicle\Services\VehicleService;
 use Modules\Vehicle\Services\VehicleTypeService;
 
 final class VehicleServiceProvider extends ServiceProvider
@@ -134,6 +138,16 @@ final class VehicleServiceProvider extends ServiceProvider
         $this->app->singleton(
             VehicleTypeServiceInterface::class,
             VehicleTypeService::class,
+        );
+
+        $this->app->singleton(
+            VehicleRepositoryInterface::class,
+            VehicleRepository::class,
+        );
+
+        $this->app->singleton(
+            VehicleServiceInterface::class,
+            VehicleService::class,
         );
     }
 
