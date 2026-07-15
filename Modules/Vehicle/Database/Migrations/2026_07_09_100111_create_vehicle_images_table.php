@@ -12,13 +12,30 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('vehicle_id')
-                ->constrained('vehicles')
+                ->constrained()
                 ->cascadeOnDelete();
 
-            $table->string('path')->nullable();
-            $table->boolean('is_primary')->default(false);
+            $table->string('disk')->default('public');
+
+            $table->string('path');
+
+            $table->string('thumbnail_path')->nullable();
+
+            $table->string('original_name');
+
+            $table->string('mime_type');
+
+            $table->unsignedBigInteger('size');
+
+            $table->unsignedSmallInteger('sort_order')
+                ->default(0);
+
+            $table->boolean('is_primary')
+                ->default(false);
 
             $table->timestamps();
+
+            $table->softDeletes();
         });
     }
 
