@@ -15,6 +15,7 @@ use Modules\Vehicle\Http\Controllers\Api\Catalog\VehicleTypeController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleDocumentController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleImageController;
+use Modules\Vehicle\Http\Controllers\Api\VehicleOwnerController;
 
 Route::prefix('api/v1/vehicle')
     ->middleware('api')
@@ -168,6 +169,24 @@ Route::prefix('api/v1/vehicle')
 
                         Route::post('/', 'store')->name('store');
                     });
+
+                /*
+            |--------------------------------------------------------------------------
+            | Vehicle Owner
+            |--------------------------------------------------------------------------
+            */
+
+                Route::controller(VehicleOwnerController::class)
+                    ->prefix('{vehicle}/owners')
+                    ->name('owners.')
+                    ->group(function (): void {
+
+                        Route::get('/', 'index')
+                            ->name('index');
+
+                        Route::post('/', 'store')
+                            ->name('store');
+                    });
             });
 
         Route::prefix('vehicle-images')
@@ -197,6 +216,21 @@ Route::prefix('api/v1/vehicle')
                     ->name('update');
 
                 Route::delete('/{vehicleDocument}', 'destroy')
+                    ->name('destroy');
+            });
+
+        Route::prefix('vehicle-owners')
+            ->name('vehicle-owners.')
+            ->controller(VehicleOwnerController::class)
+            ->group(function (): void {
+
+                Route::get('/{vehicleOwner}', 'show')
+                    ->name('show');
+
+                Route::patch('/{vehicleOwner}', 'update')
+                    ->name('update');
+
+                Route::delete('/{vehicleOwner}', 'destroy')
                     ->name('destroy');
             });
     });

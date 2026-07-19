@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\IAM\Models\User;
+use Modules\Vehicle\Database\Factories\VehicleFactory;
 
 class Vehicle extends Model
 {
@@ -44,6 +45,11 @@ class Vehicle extends Model
     | Relationships
     |--------------------------------------------------------------------------
     */
+
+    protected static function newFactory()
+    {
+        return VehicleFactory::new();
+    }
 
     public function user(): BelongsTo
     {
