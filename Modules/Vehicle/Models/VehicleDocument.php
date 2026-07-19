@@ -5,12 +5,16 @@ namespace Modules\Vehicle\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Vehicle\Database\Factories\VehicleDocumentFactory;
 
 class VehicleDocument extends Model
 {
     use HasFactory;
-    use SoftDeletes;
+
+    protected static function newFactory(): VehicleDocumentFactory
+    {
+        return VehicleDocumentFactory::new();
+    }
 
     protected $fillable = [
         'vehicle_id',
@@ -18,8 +22,6 @@ class VehicleDocument extends Model
         'document_number',
         'issue_date',
         'expiry_date',
-        'issuer',
-        'notes',
         'file_name',
         'original_name',
         'mime_type',
@@ -29,14 +31,11 @@ class VehicleDocument extends Model
         'metadata',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'issue_date' => 'date',
-            'expiry_date' => 'date',
-            'metadata' => 'array',
-        ];
-    }
+    protected $casts = [
+        'issue_date' => 'date',
+        'expiry_date' => 'date',
+        'metadata' => 'array',
+    ];
 
     public function vehicle(): BelongsTo
     {

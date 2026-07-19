@@ -5,10 +5,16 @@ namespace Modules\Vehicle\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Vehicle\Database\Factories\VehicleDocumentTypeFactory;
 
 class VehicleDocumentType extends Model
 {
     use HasFactory;
+
+    protected static function newFactory(): VehicleDocumentTypeFactory
+    {
+        return VehicleDocumentTypeFactory::new();
+    }
 
     protected $fillable = [
         'name',
