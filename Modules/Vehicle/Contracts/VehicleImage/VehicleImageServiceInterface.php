@@ -6,9 +6,9 @@ namespace Modules\Vehicle\Contracts\VehicleImage;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\UploadedFile;
 use Modules\Vehicle\Models\Vehicle;
 use Modules\Vehicle\Models\VehicleImage;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 interface VehicleImageServiceInterface
 {

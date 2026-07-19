@@ -21,6 +21,8 @@ use Modules\Vehicle\Contracts\Transmission\TransmissionRepositoryInterface;
 use Modules\Vehicle\Contracts\Transmission\TransmissionServiceInterface;
 use Modules\Vehicle\Contracts\Vehicle\VehicleRepositoryInterface;
 use Modules\Vehicle\Contracts\Vehicle\VehicleServiceInterface;
+use Modules\Vehicle\Contracts\VehicleDocument\VehicleDocumentRepositoryInterface;
+use Modules\Vehicle\Contracts\VehicleDocument\VehicleDocumentServiceInterface;
 use Modules\Vehicle\Contracts\VehicleImage\VehicleImageRepositoryInterface;
 use Modules\Vehicle\Contracts\VehicleImage\VehicleImageServiceInterface;
 use Modules\Vehicle\Contracts\VehicleModel\VehicleModelRepositoryInterface;
@@ -34,6 +36,7 @@ use Modules\Vehicle\Repositories\EngineRepository;
 use Modules\Vehicle\Repositories\FuelTypeRepository;
 use Modules\Vehicle\Repositories\GenerationRepository;
 use Modules\Vehicle\Repositories\TransmissionRepository;
+use Modules\Vehicle\Repositories\VehicleDocumentRepository;
 use Modules\Vehicle\Repositories\VehicleImageRepository;
 use Modules\Vehicle\Repositories\VehicleModelRepository;
 use Modules\Vehicle\Repositories\VehicleRepository;
@@ -45,6 +48,7 @@ use Modules\Vehicle\Services\EngineService;
 use Modules\Vehicle\Services\FuelTypeService;
 use Modules\Vehicle\Services\GenerationService;
 use Modules\Vehicle\Services\TransmissionService;
+use Modules\Vehicle\Services\VehicleDocumentService;
 use Modules\Vehicle\Services\VehicleImageService;
 use Modules\Vehicle\Services\VehicleModelService;
 use Modules\Vehicle\Services\VehicleService;
@@ -122,6 +126,16 @@ final class VehicleServiceProvider extends ServiceProvider
         $this->app->singleton(
             FuelTypeServiceInterface::class,
             FuelTypeService::class,
+        );
+
+        $this->app->singleton(
+            VehicleDocumentRepositoryInterface::class,
+            VehicleDocumentRepository::class,
+        );
+
+        $this->app->singleton(
+            VehicleDocumentServiceInterface::class,
+            VehicleDocumentService::class,
         );
 
         $this->app->singleton(

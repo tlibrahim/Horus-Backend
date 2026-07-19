@@ -11,6 +11,7 @@ use Modules\Vehicle\Database\Seeders\Vehicle\FuelTypeSeeder;
 use Modules\Vehicle\Database\Seeders\Vehicle\GenerationSeeder;
 use Modules\Vehicle\Database\Seeders\Vehicle\ModelSeeder;
 use Modules\Vehicle\Database\Seeders\Vehicle\TransmissionSeeder;
+use Modules\Vehicle\Database\Seeders\Vehicle\VehicleDocumentTypeSeeder;
 use Modules\Vehicle\Database\Seeders\Vehicle\VehicleSeeder;
 use Modules\Vehicle\Database\Seeders\Vehicle\VehicleTypeSeeder;
 
@@ -29,6 +30,7 @@ class VehicleDatabaseSeeder extends Seeder
             GenerationSeeder::class,
             EngineSeeder::class,
             VehicleSeeder::class,
+            VehicleDocumentTypeSeeder::class,
         ]);
     }
 }

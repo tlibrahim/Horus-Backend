@@ -13,6 +13,7 @@ use Modules\Vehicle\Http\Controllers\Api\Catalog\TransmissionController;
 use Modules\Vehicle\Http\Controllers\Api\Catalog\VehicleModelController;
 use Modules\Vehicle\Http\Controllers\Api\Catalog\VehicleTypeController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleController;
+use Modules\Vehicle\Http\Controllers\Api\VehicleDocumentController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleImageController;
 
 Route::prefix('api/v1/vehicle')
@@ -151,6 +152,22 @@ Route::prefix('api/v1/vehicle')
 
                         Route::post('/', 'store')->name('store');
                     });
+
+                /*
+                |--------------------------------------------------------------------------
+                | Vehicle Documents
+                |--------------------------------------------------------------------------
+                */
+
+                Route::controller(VehicleDocumentController::class)
+                    ->prefix('{vehicle}/documents')
+                    ->name('documents.')
+                    ->group(function (): void {
+
+                        Route::get('/', 'index')->name('index');
+
+                        Route::post('/', 'store')->name('store');
+                    });
             });
 
         Route::prefix('vehicle-images')
@@ -166,5 +183,20 @@ Route::prefix('api/v1/vehicle')
 
                 Route::patch('/{vehicleImage}/primary', 'setPrimary')
                     ->name('set-primary');
+            });
+
+        Route::prefix('vehicle-documents')
+            ->name('vehicle-documents.')
+            ->controller(VehicleDocumentController::class)
+            ->group(function (): void {
+
+                Route::get('/{vehicleDocument}', 'show')
+                    ->name('show');
+
+                Route::patch('/{vehicleDocument}', 'update')
+                    ->name('update');
+
+                Route::delete('/{vehicleDocument}', 'destroy')
+                    ->name('destroy');
             });
     });

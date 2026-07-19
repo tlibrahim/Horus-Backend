@@ -9,11 +9,11 @@ use App\Support\Contracts\FileStorageServiceInterface;
 use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\UploadedFile;
 use Modules\Vehicle\Contracts\VehicleImage\VehicleImageRepositoryInterface;
 use Modules\Vehicle\Contracts\VehicleImage\VehicleImageServiceInterface;
 use Modules\Vehicle\Models\Vehicle;
 use Modules\Vehicle\Models\VehicleImage;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class VehicleImageService extends BaseCrudService implements VehicleImageServiceInterface
 {
@@ -56,7 +56,7 @@ final class VehicleImageService extends BaseCrudService implements VehicleImageS
                 directory: "vehicles/{$vehicle->id}",
             );
 
-            return $this->repository->create([
+            return $this->createFromRepository([
                 'vehicle_id' => $vehicle->id,
 
                 'disk' => $file['disk'],
