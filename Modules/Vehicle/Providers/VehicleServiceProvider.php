@@ -27,6 +27,8 @@ use Modules\Vehicle\Contracts\VehicleImage\VehicleImageRepositoryInterface;
 use Modules\Vehicle\Contracts\VehicleImage\VehicleImageServiceInterface;
 use Modules\Vehicle\Contracts\VehicleModel\VehicleModelRepositoryInterface;
 use Modules\Vehicle\Contracts\VehicleModel\VehicleModelServiceInterface;
+use Modules\Vehicle\Contracts\VehicleOwner\VehicleOwnerRepositoryInterface;
+use Modules\Vehicle\Contracts\VehicleOwner\VehicleOwnerServiceInterface;
 use Modules\Vehicle\Contracts\VehicleType\VehicleTypeRepositoryInterface;
 use Modules\Vehicle\Contracts\VehicleType\VehicleTypeServiceInterface;
 use Modules\Vehicle\Repositories\BodyTypeRepository;
@@ -39,6 +41,7 @@ use Modules\Vehicle\Repositories\TransmissionRepository;
 use Modules\Vehicle\Repositories\VehicleDocumentRepository;
 use Modules\Vehicle\Repositories\VehicleImageRepository;
 use Modules\Vehicle\Repositories\VehicleModelRepository;
+use Modules\Vehicle\Repositories\VehicleOwnerRepository;
 use Modules\Vehicle\Repositories\VehicleRepository;
 use Modules\Vehicle\Repositories\VehicleTypeRepository;
 use Modules\Vehicle\Services\BodyTypeService;
@@ -51,6 +54,7 @@ use Modules\Vehicle\Services\TransmissionService;
 use Modules\Vehicle\Services\VehicleDocumentService;
 use Modules\Vehicle\Services\VehicleImageService;
 use Modules\Vehicle\Services\VehicleModelService;
+use Modules\Vehicle\Services\VehicleOwnerService;
 use Modules\Vehicle\Services\VehicleService;
 use Modules\Vehicle\Services\VehicleTypeService;
 
@@ -121,6 +125,16 @@ final class VehicleServiceProvider extends ServiceProvider
         $this->app->singleton(
             EngineServiceInterface::class,
             EngineService::class,
+        );
+
+        $this->app->singleton(
+            VehicleOwnerRepositoryInterface::class,
+            VehicleOwnerRepository::class,
+        );
+
+        $this->app->singleton(
+            VehicleOwnerServiceInterface::class,
+            VehicleOwnerService::class,
         );
 
         $this->app->singleton(
