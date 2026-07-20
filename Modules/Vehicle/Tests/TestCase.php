@@ -58,4 +58,23 @@ abstract class TestCase extends BaseTestCase
             'is_active' => true,
         ], $overrides);
     }
+
+    protected function validObdDeviceData(array $overrides = []): array
+    {
+        return array_merge([
+            'serial_number' => 'OBD-123456789',
+            'manufacturer' => 'Launch',
+            'model' => 'X431',
+            'firmware_version' => '1.0.0',
+            'hardware_version' => '1.0',
+            'connection_type' => 'bluetooth',
+            'status' => 'active',
+            'mac_address' => '00:11:22:33:44:55',
+            'imei' => '123456789012345',
+            'sim_number' => '01234567890123456789',
+            'metadata' => [
+                'battery' => 100,
+            ],
+        ], $overrides);
+    }
 }

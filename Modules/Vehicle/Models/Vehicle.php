@@ -115,4 +115,9 @@ class Vehicle extends Model
     {
         return $this->hasMany(VehicleService::class);
     }
+
+    public function activeObdDevices(): HasMany
+    {
+        return $this->hasMany(VehicleObdDevice::class);
+    }
 }

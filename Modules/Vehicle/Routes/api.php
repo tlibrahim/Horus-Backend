@@ -12,6 +12,7 @@ use Modules\Vehicle\Http\Controllers\Api\Catalog\GenerationController;
 use Modules\Vehicle\Http\Controllers\Api\Catalog\TransmissionController;
 use Modules\Vehicle\Http\Controllers\Api\Catalog\VehicleModelController;
 use Modules\Vehicle\Http\Controllers\Api\Catalog\VehicleTypeController;
+use Modules\Vehicle\Http\Controllers\Api\OBD\ObdDeviceController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleDocumentController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleImageController;
@@ -232,5 +233,19 @@ Route::prefix('api/v1/vehicle')
 
                 Route::delete('/{vehicleOwner}', 'destroy')
                     ->name('destroy');
+            });
+
+        Route::prefix('obd-devices')
+            ->name('obd-devices.')
+            ->controller(ObdDeviceController::class)
+            ->group(function (): void {
+                Route::get('/', 'index')->name('index');
+                Route::get('/options', 'options')->name('options');
+                Route::post('/', 'store')->name('store');
+                Route::get('/{obdDevice}', 'show')->name('show');
+                Route::put('/{obdDevice}', 'update')->name('update');
+                Route::patch('/{obdDevice}/toggle-status', 'toggleStatus')
+                    ->name('toggleStatus');
+                Route::delete('/{obdDevice}', 'destroy')->name('destroy');
             });
     });
