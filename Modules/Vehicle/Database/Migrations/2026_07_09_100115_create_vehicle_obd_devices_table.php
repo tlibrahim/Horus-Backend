@@ -11,17 +11,26 @@ return new class extends Migration
         Schema::create('vehicle_obd_devices', function (Blueprint $table): void {
             $table->id();
 
-            $table->foreignId('obd_device_id')
-                ->constrained('obd_devices')
-                ->cascadeOnDelete();
-
             $table->foreignId('vehicle_id')
-                ->constrained('vehicles')
+                ->constrained()
                 ->cascadeOnDelete();
 
-            $table->date('paired_at')->nullable();
+            $table->foreignId('obd_device_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->timestamp('paired_at');
+
+            $table->timestamp('unpaired_at')->nullable();
+
+            $table->boolean('is_active')->default(true);
+
+            $table->text('notes')->nullable();
 
             $table->timestamps();
+
+            $table->index(['vehicle_id', 'is_active']);
+            $table->index(['obd_device_id', 'is_active']);
         });
     }
 

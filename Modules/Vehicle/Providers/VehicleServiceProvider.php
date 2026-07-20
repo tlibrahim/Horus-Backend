@@ -17,6 +17,8 @@ use Modules\Vehicle\Contracts\FuelType\FuelTypeRepositoryInterface;
 use Modules\Vehicle\Contracts\FuelType\FuelTypeServiceInterface;
 use Modules\Vehicle\Contracts\Generation\GenerationRepositoryInterface;
 use Modules\Vehicle\Contracts\Generation\GenerationServiceInterface;
+use Modules\Vehicle\Contracts\OBD\Repositories\ObdDeviceRepositoryInterface;
+use Modules\Vehicle\Contracts\OBD\Services\ObdDeviceServiceInterface;
 use Modules\Vehicle\Contracts\Transmission\TransmissionRepositoryInterface;
 use Modules\Vehicle\Contracts\Transmission\TransmissionServiceInterface;
 use Modules\Vehicle\Contracts\Vehicle\VehicleRepositoryInterface;
@@ -37,6 +39,7 @@ use Modules\Vehicle\Repositories\DriveTypeRepository;
 use Modules\Vehicle\Repositories\EngineRepository;
 use Modules\Vehicle\Repositories\FuelTypeRepository;
 use Modules\Vehicle\Repositories\GenerationRepository;
+use Modules\Vehicle\Repositories\ObdDeviceRepository;
 use Modules\Vehicle\Repositories\TransmissionRepository;
 use Modules\Vehicle\Repositories\VehicleDocumentRepository;
 use Modules\Vehicle\Repositories\VehicleImageRepository;
@@ -50,6 +53,7 @@ use Modules\Vehicle\Services\DriveTypeService;
 use Modules\Vehicle\Services\EngineService;
 use Modules\Vehicle\Services\FuelTypeService;
 use Modules\Vehicle\Services\GenerationService;
+use Modules\Vehicle\Services\ObdDeviceService;
 use Modules\Vehicle\Services\TransmissionService;
 use Modules\Vehicle\Services\VehicleDocumentService;
 use Modules\Vehicle\Services\VehicleImageService;
@@ -65,6 +69,16 @@ final class VehicleServiceProvider extends ServiceProvider
         $this->app->singleton(
             BrandRepositoryInterface::class,
             BrandRepository::class,
+        );
+
+        $this->app->singleton(
+            ObdDeviceRepositoryInterface::class,
+            ObdDeviceRepository::class,
+        );
+
+        $this->app->singleton(
+            ObdDeviceServiceInterface::class,
+            ObdDeviceService::class,
         );
 
         $this->app->singleton(
