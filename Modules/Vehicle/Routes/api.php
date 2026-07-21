@@ -13,6 +13,7 @@ use Modules\Vehicle\Http\Controllers\Api\Catalog\TransmissionController;
 use Modules\Vehicle\Http\Controllers\Api\Catalog\VehicleModelController;
 use Modules\Vehicle\Http\Controllers\Api\Catalog\VehicleTypeController;
 use Modules\Vehicle\Http\Controllers\Api\OBD\ObdDeviceController;
+use Modules\Vehicle\Http\Controllers\Api\OBD\VehicleObdDeviceController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleDocumentController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleImageController;
@@ -247,5 +248,22 @@ Route::prefix('api/v1/vehicle')
                 Route::patch('/{obdDevice}/toggle-status', 'toggleStatus')
                     ->name('toggleStatus');
                 Route::delete('/{obdDevice}', 'destroy')->name('destroy');
+            });
+
+        Route::prefix('vehicles/{vehicle}/obd-devices')
+            ->name('vehicle-obd-devices.')
+            ->controller(VehicleObdDeviceController::class)
+            ->group(function (): void {
+                Route::post('/', 'pair')
+                    ->name('pair');
+
+                Route::delete('/{obdDevice}', 'unpair')
+                    ->name('unpair');
+
+                Route::get('/current', 'current')
+                    ->name('current');
+
+                Route::get('/history', 'history')
+                    ->name('history');
             });
     });
