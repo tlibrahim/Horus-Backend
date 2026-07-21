@@ -3,7 +3,7 @@
 namespace Modules\Vehicle\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Vehicle\Database\Factories\ObdDeviceFactory;
 
@@ -37,8 +37,9 @@ class ObdDevice extends BaseModel
         return ObdDeviceFactory::new();
     }
 
-    public function vehicleAssignments(): HasMany
+    public function activeVehicleAssignment(): HasOne
     {
-        return $this->hasMany(VehicleObdDevice::class);
+        return $this->hasOne(VehicleObdDevice::class)
+            ->where('is_active', true);
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\IAM\Models\User;
 use Modules\Vehicle\Database\Factories\VehicleFactory;
@@ -116,8 +117,8 @@ class Vehicle extends Model
         return $this->hasMany(VehicleService::class);
     }
 
-    public function activeObdDevices(): HasMany
+    public function activeObdDevice(): HasOne
     {
-        return $this->hasMany(VehicleObdDevice::class);
+        return $this->hasOne(VehicleObdDevice::class)->where('is_active', true);
     }
 }

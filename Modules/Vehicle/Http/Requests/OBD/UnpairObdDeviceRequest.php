@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Modules\Vehicle\Http\Requests\OBD;
 
 use App\Support\Http\Requests\BaseRequest;
-use Illuminate\Validation\Rule;
 
-final class PairObdDeviceRequest extends BaseRequest
+final class UnpairObdDeviceRequest extends BaseRequest
 {
     public function authorize(): bool
     {
@@ -17,12 +16,6 @@ final class PairObdDeviceRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'obd_device_id' => [
-                'required',
-                'integer',
-                Rule::exists('obd_devices', 'id'),
-            ],
-
             'notes' => [
                 'nullable',
                 'string',
