@@ -11,6 +11,7 @@ use Modules\IAM\Database\Seeders\IAMDatabaseSeeder;
 use Modules\Tests\Traits\ApiAssertions;
 use Modules\Vehicle\Database\Seeders\VehicleDatabaseSeeder;
 use Modules\Vehicle\Models\Brand;
+use Modules\Vehicle\Models\VehicleObdDevice;
 use Tests\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -75,6 +76,22 @@ abstract class TestCase extends BaseTestCase
             'metadata' => [
                 'battery' => 100,
             ],
+        ], $overrides);
+    }
+
+    protected function validObdSessionData(array $overrides = []): array
+    {
+        $pairing = VehicleObdDevice::query()->firstOrFail();
+
+        return array_merge([
+            'vehicle_obd_device_id' => $pairing->id,
+            'connection_type' => 'bluetooth',
+            'status' => 'connecting',
+            'started_at' => now()->toISOString(),
+            'last_activity_at' => now()->toISOString(),
+            'ip_address' => '192.168.1.10',
+            'firmware_version' => '1.0.0',
+            'metadata' => [],
         ], $overrides);
     }
 }
