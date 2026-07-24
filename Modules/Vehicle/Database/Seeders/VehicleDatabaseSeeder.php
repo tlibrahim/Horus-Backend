@@ -3,6 +3,9 @@
 namespace Modules\Vehicle\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Modules\Vehicle\Database\Seeders\OBD\ObdDeviceSeeder;
+use Modules\Vehicle\Database\Seeders\OBD\ObdSessionSeeder;
+use Modules\Vehicle\Database\Seeders\OBD\VehicleObdDeviceSeeder;
 use Modules\Vehicle\Database\Seeders\Vehicle\BodyTypeSeeder;
 use Modules\Vehicle\Database\Seeders\Vehicle\BrandSeeder;
 use Modules\Vehicle\Database\Seeders\Vehicle\DriveTypeSeeder;
@@ -33,6 +36,9 @@ class VehicleDatabaseSeeder extends Seeder
             VehicleSeeder::class,
             VehicleDocumentTypeSeeder::class,
             VehicleOwnerSeeder::class,
+            ObdDeviceSeeder::class,
+            VehicleObdDeviceSeeder::class,
+            ObdSessionSeeder::class,
         ]);
     }
 }
