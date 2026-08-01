@@ -7,7 +7,7 @@ namespace Modules\Vehicle\Http\Requests\VehicleOwner;
 use App\Support\Http\Requests\BaseRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
-use Modules\IAM\Models\User;
+use Modules\Auth\Models\User;
 use Modules\Vehicle\Enums\OwnershipType;
 
 final class StoreVehicleOwnerRequest extends BaseRequest

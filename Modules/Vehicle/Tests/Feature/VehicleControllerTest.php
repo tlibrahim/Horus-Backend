@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Vehicle\Tests\Feature;
 
-use Modules\IAM\Models\User;
+use Modules\Auth\Models\User;
 use Modules\Vehicle\Models\BodyType;
 use Modules\Vehicle\Models\DriveType;
 use Modules\Vehicle\Models\Engine;

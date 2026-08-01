@@ -1,0 +1,993 @@
+openapi: 3.0.3
+info:
+  title: Horus Backend API
+  version: "1.0.0"
+  description: |
+    OpenAPI documentation for the Horus Laravel backend.
+
+    This spec currently documents the **Auth module** (Auth, Roles, Permissions)
+    in full, as a template for documenting the remaining modules
+    (Vehicle, OBD, Core, ...). To extend coverage:
+
+    1. Add new `tags` entries below for the module.
+    2. Add its `paths` following the same request/response envelope shapes
+       already defined in `components.schemas` (`SuccessEnvelope`,
+       `ErrorEnvelope`, `PaginationMeta`).
+    3. Reuse `components.securitySchemes.bearerAuth` for any route protected
+       by the `auth.token` middleware.
+
+    ## Response envelope
+    All endpoints return a consistent JSON envelope:
+    - Success: `{ "success": true, "message": ..., "data": ..., "meta": {...} }`
+    - Error (RFC 7807 problem details): `{ "success": false, "error": { "type", "title", "status", "detail", "instance", "errors" }, "meta": {...} }`
+
+    ## Authentication
+    Protected endpoints require `Authorization: Bearer {access_token}`.
+    The access token is a short-lived (15 min default) signed token returned
+    by `/auth/login`, `/auth/refresh`, or after OTP verification. Use the
+    "Authorize" button in Swagger UI to set it once for all requests.
+
+    ## Pagination & filtering
+    List (`index`) endpoints support:
+    - `page` (integer, default 1) — page number, 15 records per page.
+    - `filter[field]=value` — per-resource filters (see each endpoint).
+
+servers:
+  - url: /api/v1
+    description: Default API base path (adjust host as needed)
+
+tags:
+  - name: Auth
+    description: Registration, OTP verification, login, tokens, and password management (`Modules/Auth`).
+  - name: Roles
+    description: |
+      Role CRUD and permission assignment (`Modules/Auth`).
+      ⚠️ Currently **not** protected by the `auth.token` middleware (known gap, see repo security notes) —
+      documented here to reflect actual current behavior.
+  - name: Permissions
+    description: |
+      Permission CRUD (`Modules/Auth`).
+      ⚠️ Currently **not** protected by the `auth.token` middleware (same gap as Roles).
+
+security: []
+
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      description: Creates a user account and sends an OTP (purpose `register`) to the mobile number for verification.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered, OTP sent
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user:
+                            $ref: '#/components/schemas/User'
+                          otp_sent:
+                            type: boolean
+                          expires_at:
+                            type: string
+                            format: date-time
+                            nullable: true
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/verify-otp:
+    post:
+      tags: [Auth]
+      summary: Verify an OTP code
+      description: Verifies an OTP for `register`, `login`, or `forgot_password` purposes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyOtpRequest'
+      responses:
+        '200':
+          description: OTP verification result
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          verified:
+                            type: boolean
+                          purpose:
+                            type: string
+                            enum: [register, login, forgot_password]
+                          mobile:
+                            type: string
+                          user:
+                            allOf:
+                              - $ref: '#/components/schemas/User'
+                            nullable: true
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/resend-otp:
+    post:
+      tags: [Auth]
+      summary: Resend an OTP code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResendOtpRequest'
+      responses:
+        '200':
+          description: OTP resent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          description: Too many OTP requests (throttled)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Log in with mobile/email + password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authenticated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AuthTokenPayload'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Exchange a refresh token for a new access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: New token pair issued
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AuthTokenPayload'
+        '401':
+          description: Refresh token invalid, expired, or revoked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Request a password-reset OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        '200':
+          description: Reset OTP sent (if account exists)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Reset password using OTP code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '200':
+          description: Password reset successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Log out the current session
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+      responses:
+        '200':
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/logout-all:
+    post:
+      tags: [Auth]
+      summary: Log out all sessions/devices for the current user
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: All sessions logged out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/change-password:
+    post:
+      tags: [Auth]
+      summary: Change the current user's password
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '200':
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Get the currently authenticated user
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/roles:
+    get:
+      tags: [Roles]
+      summary: List roles
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: filter[name]
+          in: query
+          schema: { type: string }
+          description: Partial (ILIKE) match on role name.
+        - name: filter[is_active]
+          in: query
+          schema: { type: boolean }
+        - name: filter[is_system]
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Paginated list of roles
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/Role' }
+    post:
+      tags: [Roles]
+      summary: Create a role
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreRoleRequest'
+      responses:
+        '201':
+          description: Role created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Role' }
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/roles/options:
+    get:
+      tags: [Roles]
+      summary: List roles as select options
+      responses:
+        '200':
+          description: Role options
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/RoleOption' }
+
+  /auth/roles/{role}:
+    parameters:
+      - $ref: '#/components/parameters/RoleId'
+    get:
+      tags: [Roles]
+      summary: Get a role by ID
+      responses:
+        '200':
+          description: Role details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Role' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Roles]
+      summary: Update a role
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoleRequest'
+      responses:
+        '200':
+          description: Role updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Role' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Roles]
+      summary: Delete a role
+      responses:
+        '200':
+          description: Role deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /auth/roles/{role}/status:
+    patch:
+      tags: [Roles]
+      summary: Toggle or set a role's active status
+      parameters:
+        - $ref: '#/components/parameters/RoleId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoleStatusRequest'
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Role' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/roles/{role}/activate:
+    patch:
+      tags: [Roles]
+      summary: Activate a role
+      parameters:
+        - $ref: '#/components/parameters/RoleId'
+      responses:
+        '200':
+          description: Role activated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Role' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /auth/roles/{role}/deactivate:
+    patch:
+      tags: [Roles]
+      summary: Deactivate a role
+      parameters:
+        - $ref: '#/components/parameters/RoleId'
+      responses:
+        '200':
+          description: Role deactivated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Role' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /auth/roles/{role}/permissions:
+    parameters:
+      - $ref: '#/components/parameters/RoleId'
+    get:
+      tags: [Roles]
+      summary: List a role's assigned permissions
+      responses:
+        '200':
+          description: Permissions assigned to the role
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/Permission' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Roles]
+      summary: Sync (replace) a role's assigned permissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncRolePermissionsRequest'
+      responses:
+        '200':
+          description: Permissions synced
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          role: { $ref: '#/components/schemas/Role' }
+                          permissions:
+                            type: array
+                            items: { $ref: '#/components/schemas/Permission' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/permissions:
+    get:
+      tags: [Permissions]
+      summary: List permissions
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: filter[name]
+          in: query
+          schema: { type: string }
+        - name: filter[code]
+          in: query
+          schema: { type: string }
+        - name: filter[group]
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Paginated list of permissions
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/Permission' }
+    post:
+      tags: [Permissions]
+      summary: Create a permission
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorePermissionRequest'
+      responses:
+        '201':
+          description: Permission created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Permission' }
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/permissions/options:
+    get:
+      tags: [Permissions]
+      summary: List permissions as select options
+      responses:
+        '200':
+          description: Permission options
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/PermissionOption' }
+
+  /auth/permissions/{permission}:
+    parameters:
+      - name: permission
+        in: path
+        required: true
+        schema: { type: integer }
+        description: Permission ID
+    get:
+      tags: [Permissions]
+      summary: Get a permission by ID
+      responses:
+        '200':
+          description: Permission details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Permission' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Permissions]
+      summary: Update a permission
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePermissionRequest'
+      responses:
+        '200':
+          description: Permission updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Permission' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Permissions]
+      summary: Delete a permission
+      responses:
+        '200':
+          description: Permission deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: "custom-signed-token"
+      description: |
+        Short-lived (default 15 min) signed access token returned by
+        `/auth/login` or `/auth/refresh`. Sent as `Authorization: Bearer {token}`.
+        Enforced by the `auth.token` middleware.
+
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 1, default: 1 }
+      description: Page number (15 records per page).
+    RoleId:
+      name: role
+      in: path
+      required: true
+      schema: { type: integer }
+      description: Role ID
+
+  responses:
+    ValidationError:
+      description: Validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Unauthorized:
+      description: Missing, invalid, or expired access token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+
+  schemas:
+    PaginationMeta:
+      type: object
+      properties:
+        type: { type: string, enum: [length_aware, cursor] }
+        current_page: { type: integer }
+        last_page: { type: integer }
+        per_page: { type: integer }
+        total: { type: integer }
+        from: { type: integer, nullable: true }
+        to: { type: integer, nullable: true }
+        path: { type: string }
+
+    SuccessEnvelope:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string, nullable: true }
+        data: {}
+        meta:
+          type: object
+          properties:
+            timestamp: { type: string, format: date-time }
+            timezone: { type: string }
+            pagination:
+              $ref: '#/components/schemas/PaginationMeta'
+
+    ErrorEnvelope:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        error:
+          type: object
+          properties:
+            type: { type: string, example: "https://api.horusdrive.com/problems/validation" }
+            title: { type: string }
+            status: { type: integer, example: 422 }
+            detail: { type: string }
+            instance: { type: string }
+            errors:
+              type: object
+              additionalProperties:
+                type: array
+                items: { type: string }
+        meta:
+          type: object
+          properties:
+            timestamp: { type: string, format: date-time }
+            timezone: { type: string }
+
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        uuid: { type: string, format: uuid }
+        first_name: { type: string }
+        last_name: { type: string }
+        display_name: { type: string, nullable: true }
+        email: { type: string, format: email, nullable: true }
+        mobile: { type: string }
+        is_active: { type: boolean }
+        is_verified: { type: boolean }
+        email_verified_at: { type: string, format: date-time, nullable: true }
+        mobile_verified_at: { type: string, format: date-time, nullable: true }
+        last_login_at: { type: string, format: date-time, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    AuthTokenPayload:
+      type: object
+      properties:
+        user: { $ref: '#/components/schemas/User' }
+        access_token: { type: string }
+        refresh_token: { type: string, format: uuid }
+        token_type: { type: string, example: Bearer }
+        expires_at: { type: string, format: date-time, nullable: true }
+
+    Role:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        description: { type: string, nullable: true }
+        is_system: { type: boolean }
+        is_active: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    RoleOption:
+      type: object
+      properties:
+        label: { type: string }
+        value: { type: integer }
+
+    Permission:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        code: { type: string }
+        group: { type: string }
+        description: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    PermissionOption:
+      type: object
+      properties:
+        label: { type: string }
+        value: { type: integer }
+        code: { type: string }
+
+    RegisterRequest:
+      type: object
+      required: [first_name, last_name, mobile, password, password_confirmation]
+      properties:
+        first_name: { type: string, maxLength: 100 }
+        last_name: { type: string, maxLength: 100 }
+        display_name: { type: string, maxLength: 200, nullable: true }
+        mobile: { type: string, maxLength: 30, description: "Must be unique" }
+        email: { type: string, format: email, maxLength: 255, nullable: true, description: "Must be unique if provided" }
+        password: { type: string, minLength: 8 }
+        password_confirmation: { type: string, minLength: 8 }
+
+    LoginRequest:
+      type: object
+      required: [login, password]
+      properties:
+        login: { type: string, maxLength: 255, description: "Email or mobile number" }
+        password: { type: string, minLength: 8 }
+        device_uuid: { type: string, format: uuid, nullable: true }
+        platform: { type: string, maxLength: 50, nullable: true, example: "Android" }
+        device_name: { type: string, maxLength: 100, nullable: true }
+        os_version: { type: string, maxLength: 50, nullable: true }
+        app_version: { type: string, maxLength: 50, nullable: true }
+        browser: { type: string, maxLength: 100, nullable: true }
+        country: { type: string, minLength: 2, maxLength: 2, nullable: true, example: "AE" }
+
+    VerifyOtpRequest:
+      type: object
+      required: [mobile, code, purpose]
+      properties:
+        mobile: { type: string, maxLength: 30 }
+        code: { type: string, maxLength: 10 }
+        purpose: { type: string, enum: [register, login, forgot_password] }
+
+    ResendOtpRequest:
+      type: object
+      required: [mobile, purpose]
+      properties:
+        mobile: { type: string, maxLength: 30 }
+        purpose: { type: string, enum: [register, login, forgot_password] }
+
+    RefreshRequest:
+      type: object
+      required: [refresh_token]
+      properties:
+        refresh_token: { type: string, format: uuid }
+
+    LogoutRequest:
+      type: object
+      properties:
+        refresh_token: { type: string, format: uuid, nullable: true }
+
+    ForgotPasswordRequest:
+      type: object
+      required: [mobile]
+      properties:
+        mobile: { type: string, maxLength: 30 }
+
+    ResetPasswordRequest:
+      type: object
+      required: [mobile, code, password, password_confirmation]
+      properties:
+        mobile: { type: string, maxLength: 30 }
+        code: { type: string, maxLength: 10 }
+        password: { type: string, minLength: 8 }
+        password_confirmation: { type: string, minLength: 8 }
+
+    ChangePasswordRequest:
+      type: object
+      required: [current_password, password, password_confirmation]
+      properties:
+        current_password: { type: string, minLength: 8 }
+        password: { type: string, minLength: 8 }
+        password_confirmation: { type: string, minLength: 8 }
+
+    StoreRoleRequest:
+      type: object
+      required: [name, slug]
+      properties:
+        name: { type: string, maxLength: 100, description: "Must be unique" }
+        slug: { type: string, maxLength: 100, description: "Must be unique" }
+        description: { type: string, nullable: true }
+        is_system: { type: boolean }
+        is_active: { type: boolean }
+
+    UpdateRoleRequest:
+      type: object
+      required: [name, slug]
+      properties:
+        name: { type: string, maxLength: 100, description: "Must be unique (ignoring current role)" }
+        slug: { type: string, maxLength: 100, description: "Must be unique (ignoring current role)" }
+        description: { type: string, nullable: true }
+        is_system: { type: boolean }
+        is_active: { type: boolean }
+
+    UpdateRoleStatusRequest:
+      type: object
+      required: [is_active]
+      properties:
+        is_active: { type: boolean }
+
+    SyncRolePermissionsRequest:
+      type: object
+      required: [permissions]
+      properties:
+        permissions:
+          type: array
+          items: { type: integer }
+          description: Array of permission IDs (each must exist in `permissions.id`).
+
+    StorePermissionRequest:
+      type: object
+      required: [name, code, group]
+      properties:
+        name: { type: string, maxLength: 150 }
+        code: { type: string, maxLength: 150, description: "Must be unique" }
+        group: { type: string, maxLength: 100 }
+        description: { type: string, nullable: true }
+
+    UpdatePermissionRequest:
+      type: object
+      required: [name, code, group]
+      properties:
+        name: { type: string, maxLength: 150 }
+        code: { type: string, maxLength: 150, description: "Must be unique (ignoring current permission)" }
+        group: { type: string, maxLength: 100 }
+        description: { type: string, nullable: true }

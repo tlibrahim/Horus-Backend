@@ -12,9 +12,6 @@ use Modules\Vehicle\Http\Controllers\Api\Catalog\GenerationController;
 use Modules\Vehicle\Http\Controllers\Api\Catalog\TransmissionController;
 use Modules\Vehicle\Http\Controllers\Api\Catalog\VehicleModelController;
 use Modules\Vehicle\Http\Controllers\Api\Catalog\VehicleTypeController;
-use Modules\Vehicle\Http\Controllers\Api\OBD\ObdDeviceController;
-use Modules\Vehicle\Http\Controllers\Api\OBD\ObdSessionController;
-use Modules\Vehicle\Http\Controllers\Api\OBD\VehicleObdDeviceController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleDocumentController;
 use Modules\Vehicle\Http\Controllers\Api\VehicleImageController;
@@ -235,93 +232,5 @@ Route::prefix('api/v1/vehicle')
 
                 Route::delete('/{vehicleOwner}', 'destroy')
                     ->name('destroy');
-            });
-
-        Route::prefix('obd-devices')
-            ->name('obd-devices.')
-            ->controller(ObdDeviceController::class)
-            ->group(function (): void {
-                Route::get('/', 'index')->name('index');
-                Route::get('/options', 'options')->name('options');
-                Route::post('/', 'store')->name('store');
-                Route::get('/{obdDevice}', 'show')->name('show');
-                Route::put('/{obdDevice}', 'update')->name('update');
-                Route::patch('/{obdDevice}/toggle-status', 'toggleStatus')
-                    ->name('toggleStatus');
-                Route::delete('/{obdDevice}', 'destroy')->name('destroy');
-            });
-
-        Route::prefix('vehicles/{vehicle}/obd-devices')
-            ->name('vehicle-obd-devices.')
-            ->controller(VehicleObdDeviceController::class)
-            ->group(function (): void {
-                Route::post('/', 'pair')
-                    ->name('pair');
-
-                Route::delete('/{obdDevice}', 'unpair')
-                    ->name('unpair');
-
-                Route::get('/current', 'current')
-                    ->name('current');
-
-                Route::get('/history', 'history')
-                    ->name('history');
-            });
-
-        Route::prefix('obd-sessions')
-            ->name('obd-sessions.')
-            ->controller(ObdSessionController::class)
-            ->group(function (): void {
-
-                Route::get('/', 'index')->name('index');
-
-                Route::get('/options', 'options')->name('options');
-
-                Route::post('/', 'store')->name('store');
-
-                Route::get('/{obdSession}', 'show')->name('show');
-
-                Route::put('/{obdSession}', 'update')->name('update');
-
-                Route::patch(
-                    '/{obdSession}/toggle-status',
-                    'toggleStatus'
-                )->name('toggleStatus');
-
-                Route::delete(
-                    '/{obdSession}',
-                    'destroy'
-                )->name('destroy');
-
-                /*
-            |--------------------------------------------------------------------------
-            | Session Lifecycle
-            |--------------------------------------------------------------------------
-            */
-
-                Route::post(
-                    '/pairings/{pairing}/connect',
-                    'connect'
-                )->name('connect');
-
-                Route::patch(
-                    '/{obdSession}/heartbeat',
-                    'heartbeat'
-                )->name('heartbeat');
-
-                Route::patch(
-                    '/{obdSession}/disconnect',
-                    'disconnect'
-                )->name('disconnect');
-
-                Route::get(
-                    '/pairings/{pairing}/active',
-                    'active'
-                )->name('active');
-
-                Route::get(
-                    '/pairings/{pairing}/history',
-                    'history'
-                )->name('history');
             });
     });

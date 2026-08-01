@@ -8,7 +8,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Modules\IAM\Http\Middleware\IamAuthenticate;
+use Modules\Auth\Http\Middleware\AuthenticateAccessToken;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,7 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'iam.auth' => IamAuthenticate::class,
+            'auth.token' => AuthenticateAccessToken::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
