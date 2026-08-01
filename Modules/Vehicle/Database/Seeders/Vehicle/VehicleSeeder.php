@@ -3,7 +3,7 @@
 namespace Modules\Vehicle\Database\Seeders\Vehicle;
 
 use Illuminate\Database\Seeder;
-use Modules\IAM\Models\User;
+use Modules\Auth\Models\User;
 use Modules\Vehicle\Models\BodyType;
 use Modules\Vehicle\Models\Brand;
 use Modules\Vehicle\Models\DriveType;

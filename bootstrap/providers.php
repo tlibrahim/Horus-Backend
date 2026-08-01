@@ -1,13 +1,15 @@
 <?php
 
 use App\Providers\AppServiceProvider;
+use Modules\Auth\Providers\AuthServiceProvider;
 use Modules\Core\Providers\CoreServiceProvider;
-use Modules\IAM\Providers\IAMServiceProvider;
+use Modules\OBD\Providers\OBDServiceProvider;
 use Modules\Vehicle\Providers\VehicleServiceProvider;
 
 return [
     AppServiceProvider::class,
     CoreServiceProvider::class,
-    IAMServiceProvider::class,
+    AuthServiceProvider::class,
     VehicleServiceProvider::class,
+    OBDServiceProvider::class,
 ];

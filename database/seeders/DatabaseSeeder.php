@@ -3,8 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Modules\Auth\Database\Seeders\AuthDatabaseSeeder;
 use Modules\Core\Database\Seeders\CoreDatabaseSeeder;
-use Modules\IAM\Database\Seeders\IAMDatabaseSeeder;
+use Modules\OBD\Database\Seeders\OBDDatabaseSeeder;
 use Modules\Vehicle\Database\Seeders\VehicleDatabaseSeeder;
 
 class DatabaseSeeder extends Seeder
@@ -17,8 +18,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             CoreDatabaseSeeder::class,
-            IAMDatabaseSeeder::class,
+            AuthDatabaseSeeder::class,
             VehicleDatabaseSeeder::class,
+            OBDDatabaseSeeder::class,
         ]);
     }
 }

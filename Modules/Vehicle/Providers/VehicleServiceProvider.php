@@ -17,12 +17,6 @@ use Modules\Vehicle\Contracts\FuelType\FuelTypeRepositoryInterface;
 use Modules\Vehicle\Contracts\FuelType\FuelTypeServiceInterface;
 use Modules\Vehicle\Contracts\Generation\GenerationRepositoryInterface;
 use Modules\Vehicle\Contracts\Generation\GenerationServiceInterface;
-use Modules\Vehicle\Contracts\OBD\Repositories\ObdDeviceRepositoryInterface;
-use Modules\Vehicle\Contracts\OBD\Repositories\ObdSessionRepositoryInterface;
-use Modules\Vehicle\Contracts\OBD\Repositories\VehicleObdDeviceRepositoryInterface;
-use Modules\Vehicle\Contracts\OBD\Services\ObdDeviceServiceInterface;
-use Modules\Vehicle\Contracts\OBD\Services\ObdSessionServiceInterface;
-use Modules\Vehicle\Contracts\OBD\Services\VehicleObdDeviceServiceInterface;
 use Modules\Vehicle\Contracts\Transmission\TransmissionRepositoryInterface;
 use Modules\Vehicle\Contracts\Transmission\TransmissionServiceInterface;
 use Modules\Vehicle\Contracts\Vehicle\VehicleRepositoryInterface;
@@ -43,13 +37,10 @@ use Modules\Vehicle\Repositories\DriveTypeRepository;
 use Modules\Vehicle\Repositories\EngineRepository;
 use Modules\Vehicle\Repositories\FuelTypeRepository;
 use Modules\Vehicle\Repositories\GenerationRepository;
-use Modules\Vehicle\Repositories\ObdDeviceRepository;
-use Modules\Vehicle\Repositories\ObdSessionRepository;
 use Modules\Vehicle\Repositories\TransmissionRepository;
 use Modules\Vehicle\Repositories\VehicleDocumentRepository;
 use Modules\Vehicle\Repositories\VehicleImageRepository;
 use Modules\Vehicle\Repositories\VehicleModelRepository;
-use Modules\Vehicle\Repositories\VehicleObdDeviceRepository;
 use Modules\Vehicle\Repositories\VehicleOwnerRepository;
 use Modules\Vehicle\Repositories\VehicleRepository;
 use Modules\Vehicle\Repositories\VehicleTypeRepository;
@@ -59,18 +50,13 @@ use Modules\Vehicle\Services\DriveTypeService;
 use Modules\Vehicle\Services\EngineService;
 use Modules\Vehicle\Services\FuelTypeService;
 use Modules\Vehicle\Services\GenerationService;
-use Modules\Vehicle\Services\ObdDeviceService;
-use Modules\Vehicle\Services\ObdSessionService;
 use Modules\Vehicle\Services\TransmissionService;
 use Modules\Vehicle\Services\VehicleDocumentService;
 use Modules\Vehicle\Services\VehicleImageService;
 use Modules\Vehicle\Services\VehicleModelService;
-use Modules\Vehicle\Services\VehicleObdDeviceService;
 use Modules\Vehicle\Services\VehicleOwnerService;
 use Modules\Vehicle\Services\VehicleService;
 use Modules\Vehicle\Services\VehicleTypeService;
-
-// use Modules\Vehicle\Services\ObdSessionService;
 
 final class VehicleServiceProvider extends ServiceProvider
 {
@@ -79,16 +65,6 @@ final class VehicleServiceProvider extends ServiceProvider
         $this->app->singleton(
             BrandRepositoryInterface::class,
             BrandRepository::class,
-        );
-
-        $this->app->singleton(
-            ObdDeviceRepositoryInterface::class,
-            ObdDeviceRepository::class,
-        );
-
-        $this->app->singleton(
-            ObdDeviceServiceInterface::class,
-            ObdDeviceService::class,
         );
 
         $this->app->singleton(
@@ -214,26 +190,6 @@ final class VehicleServiceProvider extends ServiceProvider
         $this->app->singleton(
             VehicleImageServiceInterface::class,
             VehicleImageService::class,
-        );
-
-        $this->app->singleton(
-            VehicleObdDeviceRepositoryInterface::class,
-            VehicleObdDeviceRepository::class,
-        );
-
-        $this->app->singleton(
-            VehicleObdDeviceServiceInterface::class,
-            VehicleObdDeviceService::class,
-        );
-
-        $this->app->singleton(
-            ObdSessionRepositoryInterface::class,
-            ObdSessionRepository::class,
-        );
-
-        $this->app->singleton(
-            ObdSessionServiceInterface::class,
-            ObdSessionService::class,
         );
     }
 

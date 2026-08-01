@@ -7,7 +7,7 @@ namespace Modules\Vehicle\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Modules\IAM\Models\User;
+use Modules\Auth\Models\User;
 use Modules\Vehicle\Database\Factories\VehicleOwnerFactory;
 
 final class VehicleOwner extends Model

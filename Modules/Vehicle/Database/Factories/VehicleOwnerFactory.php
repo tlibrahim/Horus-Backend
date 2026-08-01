@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Modules\Vehicle\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Modules\IAM\Models\User;
+use Modules\Auth\Models\User;
 use Modules\Vehicle\Enums\OwnershipType;
 use Modules\Vehicle\Models\Vehicle;
 use Modules\Vehicle\Models\VehicleOwner;

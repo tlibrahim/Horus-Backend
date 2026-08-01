@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\IAM\Models\User;
+use Modules\Auth\Models\User;
+use Modules\OBD\Models\VehicleObdDevice;
 use Modules\Vehicle\Database\Factories\VehicleFactory;
 
 class Vehicle extends Model
