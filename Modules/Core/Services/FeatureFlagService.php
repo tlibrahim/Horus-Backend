@@ -8,15 +8,15 @@ use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Core\Contracts\Settings\Repositories\SettingRepositoryInterface;
-use Modules\Core\Contracts\Settings\Services\SettingServiceInterface;
-use Modules\Core\Filters\SettingFilter;
-use Modules\Core\Models\Setting;
+use Modules\Core\Contracts\FeatureFlags\Repositories\FeatureFlagRepositoryInterface;
+use Modules\Core\Contracts\FeatureFlags\Services\FeatureFlagServiceInterface;
+use Modules\Core\Filters\FeatureFlagFilter;
+use Modules\Core\Models\FeatureFlag;
 
-final class SettingService extends BaseCrudService implements SettingServiceInterface
+final class FeatureFlagService extends BaseCrudService implements FeatureFlagServiceInterface
 {
     public function __construct(
-        private readonly SettingRepositoryInterface $settings,
+        private readonly FeatureFlagRepositoryInterface $features,
     ) {}
 
     /*
@@ -40,33 +40,33 @@ final class SettingService extends BaseCrudService implements SettingServiceInte
         return $this->optionsFromRepository();
     }
 
-    public function find(int|string $id): Setting
+    public function find(int|string $id): FeatureFlag
     {
-        /** @var Setting */
+        /** @var FeatureFlag */
         return $this->findFromRepository($id);
     }
 
-    public function create(array $attributes): Setting
+    public function create(array $attributes): FeatureFlag
     {
-        /** @var Setting */
+        /** @var FeatureFlag */
         return $this->createFromRepository($attributes);
     }
 
     public function update(
-        Model $setting,
+        Model $featureFlag,
         array $attributes,
     ): Model {
-        /** @var Setting */
+        /** @var FeatureFlag */
         return $this->updateFromRepository(
-            $setting,
+            $featureFlag,
             $attributes,
         );
     }
 
     public function delete(
-        Model $setting,
+        Model $featureFlag,
     ): bool {
-        return $this->deleteFromRepository($setting);
+        return $this->deleteFromRepository($featureFlag);
     }
 
     /*
@@ -75,30 +75,34 @@ final class SettingService extends BaseCrudService implements SettingServiceInte
     |--------------------------------------------------------------------------
     */
 
-    public function findByKey(string $key): ?Setting
+    public function findByKey(string $key): ?FeatureFlag
     {
-        return $this->settings->findByKey($key);
+        return $this->features->findByKey($key);
     }
 
-    public function getValue(string $key): mixed
+    public function isEnabled(string $key): bool
     {
-        return $this->settings->getValue($key);
+        return $this->features->isEnabled($key);
     }
 
-    public function setValue(
-        string $key,
-        mixed $value,
-    ): Setting {
-        return $this->settings->setValue(
-            $key,
-            $value,
-        );
+    public function enable(string $key): FeatureFlag
+    {
+        return $this->features->enable($key);
     }
 
-    public function group(
-        string $group,
-    ): Collection {
-        return $this->settings->group($group);
+    public function disable(string $key): FeatureFlag
+    {
+        return $this->features->disable($key);
+    }
+
+    public function enabled(): Collection
+    {
+        return $this->features->enabled();
+    }
+
+    public function disabled(): Collection
+    {
+        return $this->features->disabled();
     }
 
     /*
@@ -107,13 +111,13 @@ final class SettingService extends BaseCrudService implements SettingServiceInte
     |--------------------------------------------------------------------------
     */
 
-    protected function repository(): SettingRepositoryInterface
+    protected function repository(): FeatureFlagRepositoryInterface
     {
-        return $this->settings;
+        return $this->features;
     }
 
     protected function filterClass(): ?string
     {
-        return SettingFilter::class;
+        return FeatureFlagFilter::class;
     }
 }

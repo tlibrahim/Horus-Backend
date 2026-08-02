@@ -13,21 +13,29 @@ use Modules\Core\Contracts\CurrencyRepositoryInterface;
 use Modules\Core\Contracts\CurrencyServiceInterface;
 use Modules\Core\Contracts\DistrictRepositoryInterface;
 use Modules\Core\Contracts\DistrictServiceInterface;
+use Modules\Core\Contracts\FeatureFlags\Repositories\FeatureFlagRepositoryInterface;
+use Modules\Core\Contracts\FeatureFlags\Services\FeatureFlagServiceInterface;
 use Modules\Core\Contracts\LanguageRepositoryInterface;
 use Modules\Core\Contracts\LanguageServiceInterface;
+use Modules\Core\Contracts\Settings\Repositories\SettingRepositoryInterface;
+use Modules\Core\Contracts\Settings\Services\SettingServiceInterface;
 use Modules\Core\Contracts\TimezoneRepositoryInterface;
 use Modules\Core\Contracts\TimezoneServiceInterface;
 use Modules\Core\Repositories\CityRepository;
 use Modules\Core\Repositories\CountryRepository;
 use Modules\Core\Repositories\CurrencyRepository;
 use Modules\Core\Repositories\DistrictRepository;
+use Modules\Core\Repositories\FeatureFlagRepository;
 use Modules\Core\Repositories\LanguageRepository;
+use Modules\Core\Repositories\SettingRepository;
 use Modules\Core\Repositories\TimezoneRepository;
 use Modules\Core\Services\CityService;
 use Modules\Core\Services\CountryService;
 use Modules\Core\Services\CurrencyService;
 use Modules\Core\Services\DistrictService;
+use Modules\Core\Services\FeatureFlagService;
 use Modules\Core\Services\LanguageService;
+use Modules\Core\Services\SettingService;
 use Modules\Core\Services\TimezoneService;
 
 final class CoreServiceProvider extends ServiceProvider
@@ -97,6 +105,26 @@ final class CoreServiceProvider extends ServiceProvider
         $this->app->singleton(
             TimezoneServiceInterface::class,
             TimezoneService::class,
+        );
+
+        $this->app->singleton(
+            SettingRepositoryInterface::class,
+            SettingRepository::class,
+        );
+
+        $this->app->singleton(
+            SettingServiceInterface::class,
+            SettingService::class,
+        );
+
+        $this->app->singleton(
+            FeatureFlagRepositoryInterface::class,
+            FeatureFlagRepository::class,
+        );
+
+        $this->app->singleton(
+            FeatureFlagServiceInterface::class,
+            FeatureFlagService::class,
         );
     }
 
