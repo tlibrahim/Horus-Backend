@@ -7,6 +7,7 @@ use Modules\Core\Http\Controllers\Api\CityController;
 use Modules\Core\Http\Controllers\Api\CountryController;
 use Modules\Core\Http\Controllers\Api\CurrencyController;
 use Modules\Core\Http\Controllers\Api\DistrictController;
+use Modules\Core\Http\Controllers\Api\FeatureFlagController;
 use Modules\Core\Http\Controllers\Api\LanguageController;
 use Modules\Core\Http\Controllers\Api\SettingController;
 use Modules\Core\Http\Controllers\Api\TimezoneController;
@@ -203,6 +204,33 @@ Route::prefix('api/v1/core')
                 Route::put('/{setting}', 'update');
 
                 Route::delete('/{setting}', 'destroy');
+            });
+
+        Route::prefix('feature-flags')
+            ->controller(FeatureFlagController::class)
+            ->group(function (): void {
+
+                Route::get('/', 'index');
+
+                Route::get('/options', 'options');
+
+                Route::get('/enabled', 'enabled');
+
+                Route::get('/disabled', 'disabled');
+
+                Route::get('/key/{key}', 'byKey');
+
+                Route::post('/', 'store');
+
+                Route::get('/{featureFlag}', 'show');
+
+                Route::put('/{featureFlag}', 'update');
+
+                Route::delete('/{featureFlag}', 'destroy');
+
+                Route::patch('/{featureFlag}/enable', 'enable');
+
+                Route::patch('/{featureFlag}/disable', 'disable');
             });
 
     });
