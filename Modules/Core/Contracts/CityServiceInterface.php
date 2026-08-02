@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Modules\Core\Contracts;
 
+use App\Support\Contracts\ActivatableServiceInterface;
+use App\Support\Contracts\CrudServiceInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Core\Models\City;
 
-interface CityServiceInterface
+interface CityServiceInterface extends ActivatableServiceInterface, CrudServiceInterface
 {
     public function all(): iterable;
 
@@ -18,11 +20,5 @@ interface CityServiceInterface
 
     public function create(array $attributes): City;
 
-    public function update(City $city, array $attributes): City;
-
     public function options(): Collection;
-
-    public function toggleStatus(City $city, bool $isActive): City;
-
-    public function delete(City $city): bool;
 }

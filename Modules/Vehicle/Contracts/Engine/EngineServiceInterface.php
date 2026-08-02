@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Modules\Vehicle\Contracts\Engine;
 
+use App\Support\Contracts\ActivatableServiceInterface;
+use App\Support\Contracts\CrudServiceInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Vehicle\Models\Engine;
 
-interface EngineServiceInterface
+interface EngineServiceInterface extends ActivatableServiceInterface, CrudServiceInterface
 {
     public function all(): iterable;
 
@@ -18,11 +20,5 @@ interface EngineServiceInterface
 
     public function create(array $attributes): Engine;
 
-    public function update(Engine $engine, array $attributes): Engine;
-
     public function options(): Collection;
-
-    public function toggleStatus(Engine $engine, bool $isActive): Engine;
-
-    public function delete(Engine $engine): bool;
 }

@@ -7,6 +7,7 @@ namespace Modules\Vehicle\Services;
 use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Vehicle\Contracts\Engine\EngineRepositoryInterface;
 use Modules\Vehicle\Contracts\Engine\EngineServiceInterface;
 use Modules\Vehicle\Filters\EngineFilter;
@@ -46,22 +47,34 @@ final class EngineService extends BaseCrudService implements EngineServiceInterf
     }
 
     public function update(
-        Engine $engine,
+        Model $engine,
         array $attributes,
-    ): Engine {
+    ): Model {
         /** @var Engine */
         return $this->updateFromRepository($engine, $attributes);
     }
 
     public function toggleStatus(
-        Engine $engine,
+        Model $engine,
         bool $isActive,
-    ): Engine {
+    ): Model {
         /** @var Engine */
         return $this->toggleStatusOnRepository($engine, $isActive);
     }
 
-    public function delete(Engine $engine): bool
+    public function activate(Model $engine): Model
+    {
+        /** @var Engine */
+        return $this->activateOnRepository($engine);
+    }
+
+    public function deactivate(Model $engine): Model
+    {
+        /** @var Engine */
+        return $this->deactivateOnRepository($engine);
+    }
+
+    public function delete(Model $engine): bool
     {
         return $this->deleteFromRepository($engine);
     }

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Modules\Vehicle\Contracts\Brand;
 
+use App\Support\Contracts\ActivatableServiceInterface;
+use App\Support\Contracts\CrudServiceInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Vehicle\Models\Brand;
 
-interface BrandServiceInterface
+interface BrandServiceInterface extends ActivatableServiceInterface, CrudServiceInterface
 {
     public function all(): iterable;
 
@@ -18,11 +20,5 @@ interface BrandServiceInterface
 
     public function create(array $attributes): Brand;
 
-    public function update(Brand $brand, array $attributes): Brand;
-
     public function options(): Collection;
-
-    public function toggleStatus(Brand $brand, bool $isActive): Brand;
-
-    public function delete(Brand $brand): bool;
 }

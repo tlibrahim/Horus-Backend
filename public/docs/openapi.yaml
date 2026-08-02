@@ -5,9 +5,9 @@ info:
   description: |
     OpenAPI documentation for the Horus Laravel backend.
 
-    This spec currently documents the **Auth module** (Auth, Roles, Permissions)
-    in full, as a template for documenting the remaining modules
-    (Vehicle, OBD, Core, ...). To extend coverage:
+    This spec documents the **Auth**, **Vehicle**, and **OBD** modules.
+    Remaining modules (Core, Booking, Workshop, Billing, Maintenance, AI, ...)
+    are not yet covered. To extend coverage:
 
     1. Add new `tags` entries below for the module.
     2. Add its `paths` following the same request/response envelope shapes
@@ -48,6 +48,40 @@ tags:
     description: |
       Permission CRUD (`Modules/Auth`).
       ⚠️ Currently **not** protected by the `auth.token` middleware (same gap as Roles).
+  - name: Vehicle Brands
+    description: |
+      Vehicle brand catalog CRUD (`Modules/Vehicle`).
+      ⚠️ Currently **not** protected by the `auth.token` middleware.
+  - name: Vehicle Models
+    description: Vehicle model catalog CRUD, scoped to a brand (`Modules/Vehicle`).
+  - name: Vehicle Generations
+    description: Vehicle generation catalog CRUD, scoped to a model (`Modules/Vehicle`).
+  - name: Vehicle Engines
+    description: Engine catalog CRUD, scoped to a generation (`Modules/Vehicle`).
+  - name: Fuel Types
+    description: Read-only fuel type lookup catalog (`Modules/Vehicle`).
+  - name: Transmissions
+    description: Read-only transmission lookup catalog (`Modules/Vehicle`).
+  - name: Drive Types
+    description: Read-only drive type lookup catalog (`Modules/Vehicle`).
+  - name: Body Types
+    description: Read-only body type lookup catalog (`Modules/Vehicle`).
+  - name: Vehicle Types
+    description: Read-only vehicle type lookup catalog (`Modules/Vehicle`).
+  - name: Vehicles
+    description: Vehicle CRUD (`Modules/Vehicle`).
+  - name: Vehicle Images
+    description: Vehicle photo upload/management (`Modules/Vehicle`).
+  - name: Vehicle Documents
+    description: Vehicle document (registration, insurance, ...) upload/management (`Modules/Vehicle`).
+  - name: Vehicle Owners
+    description: Vehicle ownership/driver assignment records (`Modules/Vehicle`).
+  - name: OBD Devices
+    description: OBD-II hardware device inventory CRUD (`Modules/OBD`).
+  - name: Vehicle OBD Pairing
+    description: Pairing/unpairing OBD devices to vehicles and pairing history (`Modules/OBD`).
+  - name: OBD Sessions
+    description: OBD telemetry session lifecycle - create, connect, heartbeat, disconnect (`Modules/OBD`).
 
 security: []
 
@@ -707,6 +741,2002 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  # ---------------------------------------------------------------------------
+  # Vehicle module - Catalog: Brands
+  # ---------------------------------------------------------------------------
+  /vehicle/brands:
+    get:
+      tags: [Vehicle Brands]
+      summary: List vehicle brands
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: filter[name]
+          in: query
+          schema: { type: string }
+          description: Partial match on brand name.
+        - name: filter[slug]
+          in: query
+          schema: { type: string }
+        - name: filter[country_id]
+          in: query
+          schema: { type: integer }
+        - name: filter[is_active]
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Paginated list of brands
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/Brand' }
+    post:
+      tags: [Vehicle Brands]
+      summary: Create a vehicle brand
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreBrandRequest'
+      responses:
+        '201':
+          description: Brand created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Brand' }
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /vehicle/brands/options:
+    get:
+      tags: [Vehicle Brands]
+      summary: List brands as select options
+      responses:
+        '200':
+          description: Brand options
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/LabelValueOption' }
+
+  /vehicle/brands/{brand}:
+    parameters:
+      - $ref: '#/components/parameters/BrandId'
+    get:
+      tags: [Vehicle Brands]
+      summary: Get a brand by ID
+      responses:
+        '200':
+          description: Brand details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Brand' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Vehicle Brands]
+      summary: Update a brand
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreBrandRequest'
+      responses:
+        '200':
+          description: Brand updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Brand' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Vehicle Brands]
+      summary: Delete (soft-delete) a brand
+      responses:
+        '204':
+          description: Brand deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vehicle/brands/{brand}/status:
+    patch:
+      tags: [Vehicle Brands]
+      summary: Toggle a brand's active status
+      parameters:
+        - $ref: '#/components/parameters/BrandId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActiveStatusRequest'
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Brand' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  # ---------------------------------------------------------------------------
+  # Vehicle module - Catalog: Models
+  # ---------------------------------------------------------------------------
+  /vehicle/models:
+    get:
+      tags: [Vehicle Models]
+      summary: List vehicle models
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: filter[brand_id]
+          in: query
+          schema: { type: integer }
+        - name: filter[name]
+          in: query
+          schema: { type: string }
+        - name: filter[slug]
+          in: query
+          schema: { type: string }
+        - name: filter[is_active]
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Paginated list of models
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/VehicleModel' }
+    post:
+      tags: [Vehicle Models]
+      summary: Create a vehicle model
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreVehicleModelRequest'
+      responses:
+        '201':
+          description: Model created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleModel' }
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /vehicle/models/options:
+    get:
+      tags: [Vehicle Models]
+      summary: List models as select options
+      parameters:
+        - name: filter[brand_id]
+          in: query
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Model options
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/LabelValueOption' }
+
+  /vehicle/models/{vehicleModel}:
+    parameters:
+      - $ref: '#/components/parameters/VehicleModelId'
+    get:
+      tags: [Vehicle Models]
+      summary: Get a model by ID
+      responses:
+        '200':
+          description: Model details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleModel' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Vehicle Models]
+      summary: Update a model
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreVehicleModelRequest'
+      responses:
+        '200':
+          description: Model updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleModel' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Vehicle Models]
+      summary: Delete (soft-delete) a model
+      responses:
+        '204':
+          description: Model deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vehicle/models/{vehicleModel}/status:
+    patch:
+      tags: [Vehicle Models]
+      summary: Toggle a model's active status
+      parameters:
+        - $ref: '#/components/parameters/VehicleModelId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActiveStatusRequest'
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleModel' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  # ---------------------------------------------------------------------------
+  # Vehicle module - Catalog: Generations
+  # ---------------------------------------------------------------------------
+  /vehicle/generations:
+    get:
+      tags: [Vehicle Generations]
+      summary: List vehicle generations
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: filter[model_id]
+          in: query
+          schema: { type: integer }
+        - name: filter[name]
+          in: query
+          schema: { type: string }
+        - name: filter[start_year]
+          in: query
+          schema: { type: integer }
+        - name: filter[end_year]
+          in: query
+          schema: { type: integer }
+        - name: filter[is_active]
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Paginated list of generations
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/Generation' }
+    post:
+      tags: [Vehicle Generations]
+      summary: Create a vehicle generation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreGenerationRequest'
+      responses:
+        '201':
+          description: Generation created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Generation' }
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /vehicle/generations/options:
+    get:
+      tags: [Vehicle Generations]
+      summary: List generations as select options
+      parameters:
+        - name: filter[model_id]
+          in: query
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Generation options
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/LabelValueOption' }
+
+  /vehicle/generations/{generation}:
+    parameters:
+      - $ref: '#/components/parameters/GenerationId'
+    get:
+      tags: [Vehicle Generations]
+      summary: Get a generation by ID
+      responses:
+        '200':
+          description: Generation details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Generation' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Vehicle Generations]
+      summary: Update a generation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreGenerationRequest'
+      responses:
+        '200':
+          description: Generation updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Generation' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Vehicle Generations]
+      summary: Delete (soft-delete) a generation
+      responses:
+        '204':
+          description: Generation deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vehicle/generations/{generation}/status:
+    patch:
+      tags: [Vehicle Generations]
+      summary: Toggle a generation's active status
+      parameters:
+        - $ref: '#/components/parameters/GenerationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActiveStatusRequest'
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Generation' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  # ---------------------------------------------------------------------------
+  # Vehicle module - Catalog: Engines
+  # ---------------------------------------------------------------------------
+  /vehicle/engines:
+    get:
+      tags: [Vehicle Engines]
+      summary: List engines
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: filter[generation_id]
+          in: query
+          schema: { type: integer }
+        - name: filter[code]
+          in: query
+          schema: { type: string }
+        - name: filter[name]
+          in: query
+          schema: { type: string }
+        - name: filter[fuel_type_id]
+          in: query
+          schema: { type: integer }
+        - name: filter[transmission_id]
+          in: query
+          schema: { type: integer }
+        - name: filter[is_active]
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Paginated list of engines
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/Engine' }
+    post:
+      tags: [Vehicle Engines]
+      summary: Create an engine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreEngineRequest'
+      responses:
+        '201':
+          description: Engine created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Engine' }
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /vehicle/engines/options:
+    get:
+      tags: [Vehicle Engines]
+      summary: List engines as select options
+      parameters:
+        - name: filter[generation_id]
+          in: query
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Engine options
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/EngineOption' }
+
+  /vehicle/engines/{engine}:
+    parameters:
+      - $ref: '#/components/parameters/EngineId'
+    get:
+      tags: [Vehicle Engines]
+      summary: Get an engine by ID
+      responses:
+        '200':
+          description: Engine details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Engine' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Vehicle Engines]
+      summary: Update an engine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreEngineRequest'
+      responses:
+        '200':
+          description: Engine updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Engine' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Vehicle Engines]
+      summary: Delete (soft-delete) an engine
+      responses:
+        '204':
+          description: Engine deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vehicle/engines/{engine}/status:
+    patch:
+      tags: [Vehicle Engines]
+      summary: Toggle an engine's active status
+      parameters:
+        - $ref: '#/components/parameters/EngineId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActiveStatusRequest'
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Engine' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  # ---------------------------------------------------------------------------
+  # Vehicle module - Read-only lookup catalogs
+  # ---------------------------------------------------------------------------
+  /vehicle/fuel-types:
+    get:
+      tags: [Fuel Types]
+      summary: List fuel types
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: filter[name]
+          in: query
+          schema: { type: string }
+        - name: filter[slug]
+          in: query
+          schema: { type: string }
+        - name: filter[is_active]
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Paginated list of fuel types
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/CatalogLookup' }
+
+  /vehicle/fuel-types/options:
+    get:
+      tags: [Fuel Types]
+      summary: List fuel types as select options
+      responses:
+        '200':
+          description: Fuel type options
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/LabelValueOption' }
+
+  /vehicle/fuel-types/{fuelType}:
+    get:
+      tags: [Fuel Types]
+      summary: Get a fuel type by ID
+      parameters:
+        - $ref: '#/components/parameters/FuelTypeId'
+      responses:
+        '200':
+          description: Fuel type details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/CatalogLookup' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vehicle/transmissions:
+    get:
+      tags: [Transmissions]
+      summary: List transmissions
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: filter[name]
+          in: query
+          schema: { type: string }
+        - name: filter[slug]
+          in: query
+          schema: { type: string }
+        - name: filter[is_active]
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Paginated list of transmissions
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/CatalogLookup' }
+
+  /vehicle/transmissions/options:
+    get:
+      tags: [Transmissions]
+      summary: List transmissions as select options
+      responses:
+        '200':
+          description: Transmission options
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/LabelValueOption' }
+
+  /vehicle/transmissions/{transmission}:
+    get:
+      tags: [Transmissions]
+      summary: Get a transmission by ID
+      parameters:
+        - $ref: '#/components/parameters/TransmissionId'
+      responses:
+        '200':
+          description: Transmission details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/CatalogLookup' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vehicle/drive-types:
+    get:
+      tags: [Drive Types]
+      summary: List drive types
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: filter[name]
+          in: query
+          schema: { type: string }
+        - name: filter[slug]
+          in: query
+          schema: { type: string }
+        - name: filter[is_active]
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Paginated list of drive types
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/CatalogLookup' }
+
+  /vehicle/drive-types/options:
+    get:
+      tags: [Drive Types]
+      summary: List drive types as select options
+      responses:
+        '200':
+          description: Drive type options
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/LabelValueOption' }
+
+  /vehicle/drive-types/{driveType}:
+    get:
+      tags: [Drive Types]
+      summary: Get a drive type by ID
+      parameters:
+        - $ref: '#/components/parameters/DriveTypeId'
+      responses:
+        '200':
+          description: Drive type details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/CatalogLookup' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vehicle/body-types:
+    get:
+      tags: [Body Types]
+      summary: List body types
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: filter[name]
+          in: query
+          schema: { type: string }
+        - name: filter[slug]
+          in: query
+          schema: { type: string }
+        - name: filter[is_active]
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Paginated list of body types
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/CatalogLookup' }
+
+  /vehicle/body-types/options:
+    get:
+      tags: [Body Types]
+      summary: List body types as select options
+      responses:
+        '200':
+          description: Body type options
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/LabelValueOption' }
+
+  /vehicle/body-types/{bodyType}:
+    get:
+      tags: [Body Types]
+      summary: Get a body type by ID
+      parameters:
+        - $ref: '#/components/parameters/BodyTypeId'
+      responses:
+        '200':
+          description: Body type details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/CatalogLookup' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vehicle/vehicle-types:
+    get:
+      tags: [Vehicle Types]
+      summary: List vehicle types
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: filter[name]
+          in: query
+          schema: { type: string }
+        - name: filter[slug]
+          in: query
+          schema: { type: string }
+        - name: filter[is_active]
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Paginated list of vehicle types
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/CatalogLookup' }
+
+  /vehicle/vehicle-types/options:
+    get:
+      tags: [Vehicle Types]
+      summary: List vehicle types as select options
+      responses:
+        '200':
+          description: Vehicle type options
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/LabelValueOption' }
+
+  /vehicle/vehicle-types/{vehicleType}:
+    get:
+      tags: [Vehicle Types]
+      summary: Get a vehicle type by ID
+      parameters:
+        - $ref: '#/components/parameters/VehicleTypeId'
+      responses:
+        '200':
+          description: Vehicle type details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/CatalogLookup' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------------------------
+  # Vehicle module - Vehicles
+  # ---------------------------------------------------------------------------
+  /vehicle/vehicles:
+    get:
+      tags: [Vehicles]
+      summary: List vehicles
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: filter[vin]
+          in: query
+          schema: { type: string }
+        - name: filter[plate_number]
+          in: query
+          schema: { type: string }
+        - name: filter[color]
+          in: query
+          schema: { type: string }
+        - name: filter[user_id]
+          in: query
+          schema: { type: integer }
+        - name: filter[brand_id]
+          in: query
+          schema: { type: integer }
+        - name: filter[model_id]
+          in: query
+          schema: { type: integer }
+        - name: filter[generation_id]
+          in: query
+          schema: { type: integer }
+        - name: filter[engine_id]
+          in: query
+          schema: { type: integer }
+        - name: filter[body_type_id]
+          in: query
+          schema: { type: integer }
+        - name: filter[drive_type_id]
+          in: query
+          schema: { type: integer }
+        - name: filter[vehicle_type_id]
+          in: query
+          schema: { type: integer }
+        - name: filter[manufacture_year]
+          in: query
+          schema: { type: integer }
+        - name: filter[is_primary]
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Paginated list of vehicles
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/Vehicle' }
+    post:
+      tags: [Vehicles]
+      summary: Create a vehicle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreVehicleRequest'
+      responses:
+        '201':
+          description: Vehicle created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Vehicle' }
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /vehicle/vehicles/options:
+    get:
+      tags: [Vehicles]
+      summary: List vehicles as select options
+      parameters:
+        - name: filter[user_id]
+          in: query
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Vehicle options
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/VehicleOption' }
+
+  /vehicle/vehicles/{vehicle}:
+    parameters:
+      - $ref: '#/components/parameters/VehicleId'
+    get:
+      tags: [Vehicles]
+      summary: Get a vehicle by ID (full nested details)
+      responses:
+        '200':
+          description: Vehicle details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleDetails' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Vehicles]
+      summary: Update a vehicle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreVehicleRequest'
+      responses:
+        '200':
+          description: Vehicle updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Vehicle' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Vehicles]
+      summary: Delete (soft-delete) a vehicle
+      responses:
+        '204':
+          description: Vehicle deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------------------------
+  # Vehicle module - Vehicle Images
+  # ---------------------------------------------------------------------------
+  /vehicle/vehicles/{vehicle}/images:
+    parameters:
+      - $ref: '#/components/parameters/VehicleId'
+    get:
+      tags: [Vehicle Images]
+      summary: List a vehicle's images
+      responses:
+        '200':
+          description: Vehicle images (ordered by sort_order)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/VehicleImage' }
+    post:
+      tags: [Vehicle Images]
+      summary: Upload a vehicle image
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StoreVehicleImageRequest'
+      responses:
+        '201':
+          description: Image uploaded
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleImageDetails' }
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /vehicle/vehicle-images/{vehicleImage}:
+    parameters:
+      - $ref: '#/components/parameters/VehicleImageId'
+    get:
+      tags: [Vehicle Images]
+      summary: Get a vehicle image by ID
+      responses:
+        '200':
+          description: Image details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleImageDetails' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Vehicle Images]
+      summary: Update image metadata (primary flag, sort order)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVehicleImageRequest'
+      responses:
+        '200':
+          description: Image updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleImageDetails' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Vehicle Images]
+      summary: Delete a vehicle image
+      responses:
+        '204':
+          description: Image deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vehicle/vehicle-images/{vehicleImage}/primary:
+    patch:
+      tags: [Vehicle Images]
+      summary: Set an image as the vehicle's primary image
+      parameters:
+        - $ref: '#/components/parameters/VehicleImageId'
+      responses:
+        '200':
+          description: Primary image updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleImageDetails' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------------------------
+  # Vehicle module - Vehicle Documents
+  # ---------------------------------------------------------------------------
+  /vehicle/vehicles/{vehicle}/documents:
+    parameters:
+      - $ref: '#/components/parameters/VehicleId'
+    get:
+      tags: [Vehicle Documents]
+      summary: List a vehicle's documents
+      responses:
+        '200':
+          description: Vehicle documents (latest first)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/VehicleDocument' }
+    post:
+      tags: [Vehicle Documents]
+      summary: Upload a vehicle document
+      description: |
+        If the selected `document_type` has `requires_number` set, `document_number` becomes required.
+        If it has `requires_expiry` set, `expiry_date` becomes required.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StoreVehicleDocumentRequest'
+      responses:
+        '201':
+          description: Document uploaded
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleDocumentDetails' }
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /vehicle/vehicle-documents/{vehicleDocument}:
+    parameters:
+      - $ref: '#/components/parameters/VehicleDocumentId'
+    get:
+      tags: [Vehicle Documents]
+      summary: Get a vehicle document by ID
+      responses:
+        '200':
+          description: Document details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleDocumentDetails' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Vehicle Documents]
+      summary: Update document metadata
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVehicleDocumentRequest'
+      responses:
+        '200':
+          description: Document updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleDocumentDetails' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Vehicle Documents]
+      summary: Delete a vehicle document
+      responses:
+        '204':
+          description: Document deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------------------------
+  # Vehicle module - Vehicle Owners
+  # ---------------------------------------------------------------------------
+  /vehicle/vehicles/{vehicle}/owners:
+    parameters:
+      - $ref: '#/components/parameters/VehicleId'
+    get:
+      tags: [Vehicle Owners]
+      summary: List a vehicle's owners/drivers
+      responses:
+        '200':
+          description: Vehicle ownership records
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/VehicleOwner' }
+    post:
+      tags: [Vehicle Owners]
+      summary: Assign an owner/driver to a vehicle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreVehicleOwnerRequest'
+      responses:
+        '201':
+          description: Owner assigned
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleOwnerDetails' }
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /vehicle/vehicle-owners/{vehicleOwner}:
+    parameters:
+      - $ref: '#/components/parameters/VehicleOwnerId'
+    get:
+      tags: [Vehicle Owners]
+      summary: Get a vehicle ownership record by ID
+      responses:
+        '200':
+          description: Ownership record details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleOwnerDetails' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Vehicle Owners]
+      summary: Update a vehicle ownership record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVehicleOwnerRequest'
+      responses:
+        '200':
+          description: Ownership record updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleOwnerDetails' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Vehicle Owners]
+      summary: Remove a vehicle ownership record
+      responses:
+        '204':
+          description: Ownership record deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------------------------
+  # OBD module - Devices
+  # ---------------------------------------------------------------------------
+  /obd/devices:
+    get:
+      tags: [OBD Devices]
+      summary: List OBD devices
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: filter[serial_number]
+          in: query
+          schema: { type: string }
+        - name: filter[manufacturer]
+          in: query
+          schema: { type: string }
+        - name: filter[model]
+          in: query
+          schema: { type: string }
+        - name: filter[connection_type]
+          in: query
+          schema: { type: string, enum: [bluetooth, wifi, gsm, usb] }
+        - name: filter[status]
+          in: query
+          schema: { type: string, enum: [active, inactive, retired] }
+        - name: filter[firmware_version]
+          in: query
+          schema: { type: string }
+        - name: filter[hardware_version]
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Paginated list of OBD devices
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/ObdDevice' }
+    post:
+      tags: [OBD Devices]
+      summary: Register a new OBD device
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreObdDeviceRequest'
+      responses:
+        '201':
+          description: Device registered
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ObdDeviceDetails' }
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /obd/devices/options:
+    get:
+      tags: [OBD Devices]
+      summary: List OBD devices as select options
+      responses:
+        '200':
+          description: Device options
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/LabelValueOption' }
+
+  /obd/devices/{obdDevice}:
+    parameters:
+      - $ref: '#/components/parameters/ObdDeviceId'
+    get:
+      tags: [OBD Devices]
+      summary: Get an OBD device by ID
+      responses:
+        '200':
+          description: Device details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ObdDeviceDetails' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [OBD Devices]
+      summary: Update an OBD device
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateObdDeviceRequest'
+      responses:
+        '200':
+          description: Device updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ObdDeviceDetails' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [OBD Devices]
+      summary: Delete an OBD device
+      responses:
+        '200':
+          description: Device deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /obd/devices/{obdDevice}/toggle-status:
+    patch:
+      tags: [OBD Devices]
+      summary: Toggle an OBD device's active status
+      parameters:
+        - $ref: '#/components/parameters/ObdDeviceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActiveStatusRequest'
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ObdDevice' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  # ---------------------------------------------------------------------------
+  # OBD module - Vehicle pairing
+  # ---------------------------------------------------------------------------
+  /obd/vehicles/{vehicle}/devices:
+    parameters:
+      - $ref: '#/components/parameters/VehicleId'
+    post:
+      tags: [Vehicle OBD Pairing]
+      summary: Pair an OBD device to a vehicle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PairObdDeviceRequest'
+      responses:
+        '201':
+          description: Device paired
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleObdDeviceDetails' }
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /obd/vehicles/{vehicle}/devices/{obdDevice}:
+    delete:
+      tags: [Vehicle OBD Pairing]
+      summary: Unpair an OBD device from a vehicle
+      parameters:
+        - $ref: '#/components/parameters/VehicleId'
+        - $ref: '#/components/parameters/ObdDeviceId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnpairObdDeviceRequest'
+      responses:
+        '200':
+          description: Device unpaired
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/VehicleObdDeviceDetails' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /obd/vehicles/{vehicle}/devices/current:
+    get:
+      tags: [Vehicle OBD Pairing]
+      summary: Get the vehicle's currently paired OBD device
+      parameters:
+        - $ref: '#/components/parameters/VehicleId'
+      responses:
+        '200':
+          description: Current pairing (or `null` if none active)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: '#/components/schemas/VehicleObdDeviceDetails'
+                        nullable: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /obd/vehicles/{vehicle}/devices/history:
+    get:
+      tags: [Vehicle OBD Pairing]
+      summary: Get the vehicle's OBD device pairing history
+      parameters:
+        - $ref: '#/components/parameters/VehicleId'
+      responses:
+        '200':
+          description: Pairing history
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/VehicleObdDevice' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------------------------
+  # OBD module - Sessions
+  # ---------------------------------------------------------------------------
+  /obd/sessions:
+    get:
+      tags: [OBD Sessions]
+      summary: List OBD sessions
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: filter[vehicle_obd_device_id]
+          in: query
+          schema: { type: integer }
+        - name: filter[connection_type]
+          in: query
+          schema: { type: string, enum: [bluetooth, wifi, gsm, usb] }
+        - name: filter[status]
+          in: query
+          schema: { type: string, enum: [connecting, connected, disconnected, failed] }
+        - name: filter[started_at_from]
+          in: query
+          schema: { type: string, format: date-time }
+        - name: filter[started_at_to]
+          in: query
+          schema: { type: string, format: date-time }
+        - name: filter[last_activity_at_from]
+          in: query
+          schema: { type: string, format: date-time }
+        - name: filter[last_activity_at_to]
+          in: query
+          schema: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Paginated list of OBD sessions
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/ObdSession' }
+    post:
+      tags: [OBD Sessions]
+      summary: Create an OBD session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreObdSessionRequest'
+      responses:
+        '201':
+          description: Session created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ObdSessionDetails' }
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /obd/sessions/options:
+    get:
+      tags: [OBD Sessions]
+      summary: List OBD sessions as select options
+      responses:
+        '200':
+          description: Session options
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/LabelValueOption' }
+
+  /obd/sessions/{obdSession}:
+    parameters:
+      - $ref: '#/components/parameters/ObdSessionId'
+    get:
+      tags: [OBD Sessions]
+      summary: Get an OBD session by ID
+      responses:
+        '200':
+          description: Session details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ObdSessionDetails' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [OBD Sessions]
+      summary: Update an OBD session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateObdSessionRequest'
+      responses:
+        '200':
+          description: Session updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ObdSessionDetails' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [OBD Sessions]
+      summary: Delete an OBD session
+      responses:
+        '200':
+          description: Session deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /obd/sessions/{obdSession}/toggle-status:
+    patch:
+      tags: [OBD Sessions]
+      summary: Toggle an OBD session's active status
+      parameters:
+        - $ref: '#/components/parameters/ObdSessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActiveStatusRequest'
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ObdSession' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /obd/sessions/{obdSession}/heartbeat:
+    patch:
+      tags: [OBD Sessions]
+      summary: Send a keep-alive heartbeat for a session
+      parameters:
+        - $ref: '#/components/parameters/ObdSessionId'
+      responses:
+        '200':
+          description: Session's `last_activity_at` updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ObdSessionDetails' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /obd/sessions/{obdSession}/disconnect:
+    patch:
+      tags: [OBD Sessions]
+      summary: Disconnect (close) a session
+      parameters:
+        - $ref: '#/components/parameters/ObdSessionId'
+      responses:
+        '200':
+          description: Session closed (status set to `disconnected`)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ObdSessionDetails' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /obd/sessions/pairings/{pairing}/connect:
+    post:
+      tags: [OBD Sessions]
+      summary: Start (connect) a new session for a vehicle/device pairing
+      parameters:
+        - $ref: '#/components/parameters/PairingId'
+      responses:
+        '201':
+          description: Session started
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ObdSessionDetails' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /obd/sessions/pairings/{pairing}/active:
+    get:
+      tags: [OBD Sessions]
+      summary: Get the active session for a pairing
+      parameters:
+        - $ref: '#/components/parameters/PairingId'
+      responses:
+        '200':
+          description: Active session (or `null` if none)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: '#/components/schemas/ObdSessionDetails'
+                        nullable: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /obd/sessions/pairings/{pairing}/history:
+    get:
+      tags: [OBD Sessions]
+      summary: Get session history for a pairing
+      parameters:
+        - $ref: '#/components/parameters/PairingId'
+      responses:
+        '200':
+          description: Session history
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/ObdSession' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -730,6 +2760,102 @@ components:
       required: true
       schema: { type: integer }
       description: Role ID
+    BrandId:
+      name: brand
+      in: path
+      required: true
+      schema: { type: integer }
+      description: Brand ID
+    VehicleModelId:
+      name: vehicleModel
+      in: path
+      required: true
+      schema: { type: integer }
+      description: Vehicle model ID
+    GenerationId:
+      name: generation
+      in: path
+      required: true
+      schema: { type: integer }
+      description: Generation ID
+    EngineId:
+      name: engine
+      in: path
+      required: true
+      schema: { type: integer }
+      description: Engine ID
+    FuelTypeId:
+      name: fuelType
+      in: path
+      required: true
+      schema: { type: integer }
+      description: Fuel type ID
+    TransmissionId:
+      name: transmission
+      in: path
+      required: true
+      schema: { type: integer }
+      description: Transmission ID
+    DriveTypeId:
+      name: driveType
+      in: path
+      required: true
+      schema: { type: integer }
+      description: Drive type ID
+    BodyTypeId:
+      name: bodyType
+      in: path
+      required: true
+      schema: { type: integer }
+      description: Body type ID
+    VehicleTypeId:
+      name: vehicleType
+      in: path
+      required: true
+      schema: { type: integer }
+      description: Vehicle type ID
+    VehicleId:
+      name: vehicle
+      in: path
+      required: true
+      schema: { type: integer }
+      description: Vehicle ID
+    VehicleImageId:
+      name: vehicleImage
+      in: path
+      required: true
+      schema: { type: integer }
+      description: Vehicle image ID
+    VehicleDocumentId:
+      name: vehicleDocument
+      in: path
+      required: true
+      schema: { type: integer }
+      description: Vehicle document ID
+    VehicleOwnerId:
+      name: vehicleOwner
+      in: path
+      required: true
+      schema: { type: integer }
+      description: Vehicle owner/driver assignment ID
+    ObdDeviceId:
+      name: obdDevice
+      in: path
+      required: true
+      schema: { type: integer }
+      description: OBD device ID
+    ObdSessionId:
+      name: obdSession
+      in: path
+      required: true
+      schema: { type: integer }
+      description: OBD session ID
+    PairingId:
+      name: pairing
+      in: path
+      required: true
+      schema: { type: integer }
+      description: Vehicle/OBD device pairing ID (`vehicle_obd_devices.id`)
 
   responses:
     ValidationError:
@@ -991,3 +3117,584 @@ components:
         code: { type: string, maxLength: 150, description: "Must be unique (ignoring current permission)" }
         group: { type: string, maxLength: 100 }
         description: { type: string, nullable: true }
+
+    # -------------------------------------------------------------------------
+    # Shared / generic
+    # -------------------------------------------------------------------------
+    LabelValueOption:
+      type: object
+      properties:
+        label: { type: string }
+        value: { type: integer }
+
+    UpdateActiveStatusRequest:
+      type: object
+      required: [is_active]
+      properties:
+        is_active: { type: boolean }
+
+    CatalogLookup:
+      type: object
+      description: Shared shape for read-only lookup catalogs (fuel types, transmissions, drive types, body types, vehicle types).
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        is_active: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    # -------------------------------------------------------------------------
+    # Vehicle module - Catalog: Brands
+    # -------------------------------------------------------------------------
+    Brand:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        logo: { type: string, nullable: true }
+        country_id: { type: integer, nullable: true }
+        is_active: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    StoreBrandRequest:
+      type: object
+      required: [name, slug]
+      properties:
+        name: { type: string, maxLength: 100 }
+        slug: { type: string, maxLength: 120, description: "Must be unique" }
+        logo: { type: string, maxLength: 255, nullable: true }
+        country_id: { type: integer, nullable: true, description: "Must exist in countries.id" }
+        is_active: { type: boolean }
+
+    # -------------------------------------------------------------------------
+    # Vehicle module - Catalog: Models
+    # -------------------------------------------------------------------------
+    VehicleModel:
+      type: object
+      properties:
+        id: { type: integer }
+        brand_id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        is_active: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    StoreVehicleModelRequest:
+      type: object
+      required: [brand_id, name, slug]
+      properties:
+        brand_id: { type: integer, description: "Must exist in brands.id" }
+        name: { type: string, maxLength: 120 }
+        slug: { type: string, maxLength: 140, description: "Must be unique" }
+        is_active: { type: boolean }
+
+    # -------------------------------------------------------------------------
+    # Vehicle module - Catalog: Generations
+    # -------------------------------------------------------------------------
+    Generation:
+      type: object
+      properties:
+        id: { type: integer }
+        model_id: { type: integer }
+        name: { type: string }
+        start_year: { type: integer, nullable: true }
+        end_year: { type: integer, nullable: true }
+        is_active: { type: boolean }
+
+    StoreGenerationRequest:
+      type: object
+      required: [model_id, name]
+      properties:
+        model_id: { type: integer, description: "Must exist in models.id" }
+        name: { type: string, maxLength: 120 }
+        start_year: { type: integer, minimum: 1900, maximum: 2100, nullable: true }
+        end_year: { type: integer, minimum: 1900, maximum: 2100, nullable: true, description: "Must be >= start_year" }
+        is_active: { type: boolean }
+
+    # -------------------------------------------------------------------------
+    # Vehicle module - Catalog: Engines
+    # -------------------------------------------------------------------------
+    Engine:
+      type: object
+      properties:
+        id: { type: integer }
+        generation_id: { type: integer }
+        code: { type: string }
+        name: { type: string }
+        displacement: { type: number, format: float, nullable: true }
+        horse_power: { type: integer, nullable: true }
+        torque: { type: integer, nullable: true }
+        fuel_type_id: { type: integer }
+        transmission_id: { type: integer }
+        is_active: { type: boolean }
+
+    EngineOption:
+      type: object
+      properties:
+        label: { type: string }
+        value: { type: integer }
+        code: { type: string }
+
+    StoreEngineRequest:
+      type: object
+      required: [generation_id, code, name, fuel_type_id, transmission_id]
+      properties:
+        generation_id: { type: integer, description: "Must exist in generations.id" }
+        code: { type: string, maxLength: 50 }
+        name: { type: string, maxLength: 120 }
+        displacement: { type: number, format: float, minimum: 0.1, maximum: 9.9, nullable: true }
+        horse_power: { type: integer, minimum: 1, maximum: 2000, nullable: true }
+        torque: { type: integer, minimum: 1, maximum: 5000, nullable: true }
+        fuel_type_id: { type: integer, description: "Must exist in fuel_types.id" }
+        transmission_id: { type: integer, description: "Must exist in transmissions.id" }
+        is_active: { type: boolean }
+
+    # -------------------------------------------------------------------------
+    # Vehicle module - Vehicles
+    # -------------------------------------------------------------------------
+    VehicleLookupRef:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+
+    VehicleEngineRef:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        code: { type: string }
+        horse_power: { type: integer, nullable: true }
+
+    Vehicle:
+      type: object
+      properties:
+        id: { type: integer }
+        user_id: { type: integer }
+        vin: { type: string, nullable: true }
+        plate_number: { type: string, nullable: true }
+        manufacture_year: { type: integer }
+        current_mileage: { type: integer }
+        color: { type: string, nullable: true }
+        is_primary: { type: boolean }
+        brand: { $ref: '#/components/schemas/VehicleLookupRef' }
+        model: { $ref: '#/components/schemas/VehicleLookupRef' }
+        generation: { $ref: '#/components/schemas/VehicleLookupRef' }
+        engine: { $ref: '#/components/schemas/VehicleEngineRef' }
+        body_type: { $ref: '#/components/schemas/VehicleLookupRef' }
+        drive_type: { $ref: '#/components/schemas/VehicleLookupRef' }
+        vehicle_type: { $ref: '#/components/schemas/VehicleLookupRef' }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    VehicleDetails:
+      type: object
+      description: Returned by the `show` endpoint, with fully-expanded nested catalog resources.
+      properties:
+        id: { type: integer }
+        user_id: { type: integer }
+        brand: { $ref: '#/components/schemas/Brand' }
+        model: { $ref: '#/components/schemas/VehicleModel' }
+        generation: { $ref: '#/components/schemas/Generation' }
+        engine: { $ref: '#/components/schemas/Engine' }
+        body_type: { $ref: '#/components/schemas/CatalogLookup' }
+        drive_type: { $ref: '#/components/schemas/CatalogLookup' }
+        vehicle_type: { $ref: '#/components/schemas/CatalogLookup' }
+        vin: { type: string, nullable: true }
+        plate_number: { type: string, nullable: true }
+        manufacture_year: { type: integer }
+        current_mileage: { type: integer }
+        color: { type: string, nullable: true }
+        is_primary: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        deleted_at: { type: string, format: date-time, nullable: true }
+
+    VehicleOption:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string, description: "Formatted as \"Brand Model (plate_number or vin)\"" }
+
+    StoreVehicleRequest:
+      type: object
+      required: [user_id, brand_id, model_id, body_type_id, drive_type_id, vehicle_type_id, manufacture_year, current_mileage]
+      properties:
+        user_id: { type: integer, description: "Must exist in users.id" }
+        brand_id: { type: integer, description: "Must exist in brands.id" }
+        model_id: { type: integer, description: "Must exist in models.id" }
+        generation_id: { type: integer, nullable: true, description: "Must exist in generations.id" }
+        engine_id: { type: integer, nullable: true, description: "Must exist in engines.id" }
+        body_type_id: { type: integer, description: "Must exist in body_types.id" }
+        drive_type_id: { type: integer, description: "Must exist in drive_types.id" }
+        vehicle_type_id: { type: integer, description: "Must exist in vehicle_types.id" }
+        vin: { type: string, minLength: 17, maxLength: 17, nullable: true, description: "Must be unique" }
+        plate_number: { type: string, maxLength: 30, nullable: true }
+        manufacture_year: { type: integer, minimum: 1950, description: "Max is current year + 1" }
+        current_mileage: { type: integer, minimum: 0 }
+        color: { type: string, maxLength: 50, nullable: true }
+        is_primary: { type: boolean }
+
+    # -------------------------------------------------------------------------
+    # Vehicle module - Vehicle Images
+    # -------------------------------------------------------------------------
+    VehicleImage:
+      type: object
+      properties:
+        id: { type: integer }
+        url: { type: string }
+        is_primary: { type: boolean }
+        sort_order: { type: integer }
+
+    VehicleImageDetails:
+      type: object
+      properties:
+        id: { type: integer }
+        vehicle_id: { type: integer }
+        disk: { type: string }
+        path: { type: string }
+        url: { type: string }
+        thumbnail_path: { type: string, nullable: true }
+        thumbnail_url: { type: string, nullable: true }
+        original_name: { type: string }
+        mime_type: { type: string }
+        size: { type: integer, description: "Bytes" }
+        sort_order: { type: integer }
+        is_primary: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    StoreVehicleImageRequest:
+      type: object
+      required: [image]
+      properties:
+        image: { type: string, format: binary, description: "jpg, jpeg, png, or webp; max 5120KB" }
+        is_primary: { type: boolean }
+        sort_order: { type: integer, minimum: 0 }
+
+    UpdateVehicleImageRequest:
+      type: object
+      properties:
+        is_primary: { type: boolean }
+        sort_order: { type: integer, minimum: 0 }
+
+    # -------------------------------------------------------------------------
+    # Vehicle module - Vehicle Documents
+    # -------------------------------------------------------------------------
+    VehicleDocument:
+      type: object
+      properties:
+        id: { type: integer }
+        document_type_id: { type: integer }
+        document_number: { type: string, nullable: true }
+        issue_date: { type: string, format: date, nullable: true }
+        expiry_date: { type: string, format: date, nullable: true }
+        file:
+          type: object
+          properties:
+            name: { type: string }
+            mime_type: { type: string }
+            size: { type: integer }
+            disk: { type: string }
+            path: { type: string }
+            url: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    VehicleDocumentDetails:
+      type: object
+      properties:
+        id: { type: integer }
+        vehicle_id: { type: integer }
+        document_type:
+          type: object
+          properties:
+            id: { type: integer }
+            name: { type: string }
+            slug: { type: string }
+        document_number: { type: string, nullable: true }
+        issue_date: { type: string, format: date, nullable: true }
+        expiry_date: { type: string, format: date, nullable: true }
+        is_expired: { type: boolean }
+        file:
+          type: object
+          properties:
+            disk: { type: string }
+            path: { type: string }
+            file_name: { type: string }
+            original_name: { type: string }
+            mime_type: { type: string }
+            size: { type: integer }
+            url: { type: string, nullable: true }
+        metadata: { type: object, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    StoreVehicleDocumentRequest:
+      type: object
+      required: [document_type_id, file]
+      properties:
+        document_type_id: { type: integer, description: "Must exist in vehicle_document_types.id (active only)" }
+        file: { type: string, format: binary, description: "pdf, jpg, jpeg, png, webp, or heic; max 20480KB" }
+        document_number: { type: string, maxLength: 255, nullable: true, description: "Required if the document type has requires_number set" }
+        issue_date: { type: string, format: date, nullable: true }
+        expiry_date: { type: string, format: date, nullable: true, description: "Must be >= issue_date. Required if the document type has requires_expiry set" }
+
+    UpdateVehicleDocumentRequest:
+      type: object
+      properties:
+        document_type_id: { type: integer, description: "Must exist in vehicle_document_types.id (active only)" }
+        document_number: { type: string, maxLength: 255, nullable: true }
+        issue_date: { type: string, format: date, nullable: true }
+        expiry_date: { type: string, format: date, nullable: true, description: "Must be >= issue_date" }
+
+    # -------------------------------------------------------------------------
+    # Vehicle module - Vehicle Owners
+    # -------------------------------------------------------------------------
+    VehicleOwner:
+      type: object
+      properties:
+        id: { type: integer }
+        user_id: { type: integer }
+        ownership_type:
+          type: string
+          enum: [owner, primary_driver, secondary_driver, company, lease, finance, fleet_manager]
+        is_primary: { type: boolean }
+        ownership_percentage: { type: number, format: float, nullable: true }
+        started_at: { type: string, format: date, nullable: true }
+        ended_at: { type: string, format: date, nullable: true }
+        created_at: { type: string, format: date-time }
+
+    VehicleOwnerDetails:
+      type: object
+      properties:
+        id: { type: integer }
+        vehicle_id: { type: integer }
+        user_id: { type: integer }
+        ownership_type:
+          type: string
+          enum: [owner, primary_driver, secondary_driver, company, lease, finance, fleet_manager]
+        is_primary: { type: boolean }
+        ownership_percentage: { type: number, format: float, nullable: true }
+        started_at: { type: string, format: date, nullable: true }
+        ended_at: { type: string, format: date, nullable: true }
+        notes: { type: string, nullable: true }
+        vehicle:
+          type: object
+          properties:
+            id: { type: integer }
+            plate_number: { type: string, nullable: true }
+        user:
+          type: object
+          properties:
+            id: { type: integer }
+            name: { type: string }
+            email: { type: string }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    StoreVehicleOwnerRequest:
+      type: object
+      required: [user_id, ownership_type]
+      properties:
+        user_id: { type: integer, description: "Must exist in users.id" }
+        ownership_type:
+          type: string
+          enum: [owner, primary_driver, secondary_driver, company, lease, finance, fleet_manager]
+        is_primary: { type: boolean }
+        ownership_percentage: { type: number, format: float, minimum: 0, maximum: 100, nullable: true }
+        started_at: { type: string, format: date, nullable: true }
+        ended_at: { type: string, format: date, nullable: true, description: "Must be >= started_at" }
+        notes: { type: string, maxLength: 1000, nullable: true }
+
+    UpdateVehicleOwnerRequest:
+      type: object
+      properties:
+        user_id: { type: integer, description: "Must exist in users.id" }
+        ownership_type:
+          type: string
+          enum: [owner, primary_driver, secondary_driver, company, lease, finance, fleet_manager]
+        is_primary: { type: boolean }
+        ownership_percentage: { type: number, format: float, minimum: 0, maximum: 100, nullable: true }
+        started_at: { type: string, format: date, nullable: true }
+        ended_at: { type: string, format: date, nullable: true, description: "Must be >= started_at" }
+        notes: { type: string, maxLength: 1000, nullable: true }
+
+    # -------------------------------------------------------------------------
+    # OBD module - Devices
+    # -------------------------------------------------------------------------
+    ObdDevice:
+      type: object
+      properties:
+        id: { type: integer }
+        serial_number: { type: string }
+        manufacturer: { type: string }
+        model: { type: string }
+        connection_type: { type: string, enum: [bluetooth, wifi, gsm, usb] }
+        status: { type: string, enum: [active, inactive, retired] }
+        last_seen_at: { type: string, format: date-time, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    ObdDeviceDetails:
+      type: object
+      properties:
+        id: { type: integer }
+        serial_number: { type: string }
+        manufacturer: { type: string }
+        model: { type: string }
+        firmware_version: { type: string, nullable: true }
+        hardware_version: { type: string, nullable: true }
+        connection_type: { type: string, enum: [bluetooth, wifi, gsm, usb] }
+        status: { type: string, enum: [active, inactive, retired] }
+        mac_address: { type: string, nullable: true }
+        imei: { type: string, nullable: true }
+        sim_number: { type: string, nullable: true }
+        metadata: { type: object, nullable: true }
+        last_seen_at: { type: string, format: date-time, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    StoreObdDeviceRequest:
+      type: object
+      required: [serial_number, manufacturer, model, connection_type]
+      properties:
+        serial_number: { type: string, maxLength: 100, description: "Must be unique. Normalized to uppercase and trimmed" }
+        manufacturer: { type: string, maxLength: 100 }
+        model: { type: string, maxLength: 100 }
+        firmware_version: { type: string, maxLength: 50, nullable: true }
+        hardware_version: { type: string, maxLength: 50, nullable: true }
+        connection_type: { type: string, enum: [bluetooth, wifi, gsm, usb] }
+        status: { type: string, enum: [active, inactive, retired] }
+        mac_address: { type: string, maxLength: 50, nullable: true }
+        imei: { type: string, maxLength: 20, nullable: true }
+        sim_number: { type: string, maxLength: 30, nullable: true }
+        metadata: { type: object, nullable: true }
+        last_seen_at: { type: string, format: date-time, nullable: true }
+
+    UpdateObdDeviceRequest:
+      type: object
+      required: [serial_number, manufacturer, model, connection_type, status]
+      properties:
+        serial_number: { type: string, maxLength: 100, description: "Must be unique (ignoring current device). Normalized to uppercase and trimmed" }
+        manufacturer: { type: string, maxLength: 100 }
+        model: { type: string, maxLength: 100 }
+        firmware_version: { type: string, maxLength: 50, nullable: true }
+        hardware_version: { type: string, maxLength: 50, nullable: true }
+        connection_type: { type: string, enum: [bluetooth, wifi, gsm, usb] }
+        status: { type: string, enum: [active, inactive, retired] }
+        mac_address: { type: string, maxLength: 50, nullable: true }
+        imei: { type: string, maxLength: 20, nullable: true }
+        sim_number: { type: string, maxLength: 30, nullable: true }
+        metadata: { type: object, nullable: true }
+        last_seen_at: { type: string, format: date-time, nullable: true }
+
+    # -------------------------------------------------------------------------
+    # OBD module - Vehicle pairing
+    # -------------------------------------------------------------------------
+    VehicleObdDevice:
+      type: object
+      properties:
+        id: { type: integer }
+        vehicle_id: { type: integer }
+        obd_device_id: { type: integer }
+        paired_at: { type: string, format: date-time }
+        unpaired_at: { type: string, format: date-time, nullable: true }
+        is_active: { type: boolean }
+        notes: { type: string, nullable: true }
+
+    VehicleObdDeviceDetails:
+      type: object
+      properties:
+        id: { type: integer }
+        vehicle:
+          type: object
+          properties:
+            id: { type: integer }
+            plate_number: { type: string, nullable: true }
+            vin: { type: string, nullable: true }
+        device:
+          type: object
+          properties:
+            id: { type: integer }
+            serial_number: { type: string }
+            manufacturer: { type: string }
+            model: { type: string }
+        paired_at: { type: string, format: date-time }
+        unpaired_at: { type: string, format: date-time, nullable: true }
+        is_active: { type: boolean }
+        notes: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    PairObdDeviceRequest:
+      type: object
+      required: [obd_device_id]
+      properties:
+        obd_device_id: { type: integer, description: "Must exist in obd_devices.id" }
+        notes: { type: string, maxLength: 1000, nullable: true }
+
+    UnpairObdDeviceRequest:
+      type: object
+      properties:
+        notes: { type: string, maxLength: 1000, nullable: true }
+
+    # -------------------------------------------------------------------------
+    # OBD module - Sessions
+    # -------------------------------------------------------------------------
+    ObdSession:
+      type: object
+      properties:
+        id: { type: integer }
+        session_uuid: { type: string, format: uuid }
+        vehicle_obd_device_id: { type: integer }
+        connection_type: { type: string, enum: [bluetooth, wifi, gsm, usb], nullable: true }
+        status: { type: string, enum: [connecting, connected, disconnected, failed], nullable: true }
+        started_at: { type: string, format: date-time, nullable: true }
+        ended_at: { type: string, format: date-time, nullable: true }
+        last_activity_at: { type: string, format: date-time, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    ObdSessionDetails:
+      type: object
+      properties:
+        id: { type: integer }
+        session_uuid: { type: string, format: uuid }
+        vehicle_obd_device_id: { type: integer }
+        connection_type: { type: string, enum: [bluetooth, wifi, gsm, usb], nullable: true }
+        status: { type: string, enum: [connecting, connected, disconnected, failed], nullable: true }
+        started_at: { type: string, format: date-time, nullable: true }
+        ended_at: { type: string, format: date-time, nullable: true }
+        last_activity_at: { type: string, format: date-time, nullable: true }
+        ip_address: { type: string, nullable: true }
+        firmware_version: { type: string, nullable: true }
+        metadata: { type: object, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    StoreObdSessionRequest:
+      type: object
+      required: [vehicle_obd_device_id, connection_type]
+      properties:
+        vehicle_obd_device_id: { type: integer, description: "Must exist in vehicle_obd_devices.id" }
+        connection_type: { type: string, enum: [bluetooth, wifi, gsm, usb] }
+        status: { type: string, enum: [connecting, connected, disconnected, failed] }
+        started_at: { type: string, format: date-time, nullable: true }
+        ip_address: { type: string, format: ipv4, nullable: true }
+        firmware_version: { type: string, maxLength: 100, nullable: true }
+        metadata: { type: object, nullable: true }
+
+    UpdateObdSessionRequest:
+      type: object
+      properties:
+        connection_type: { type: string, enum: [bluetooth, wifi, gsm, usb] }
+        status: { type: string, enum: [connecting, connected, disconnected, failed] }
+        ip_address: { type: string, format: ipv4, nullable: true }
+        firmware_version: { type: string, maxLength: 100, nullable: true }
+        metadata: { type: object, nullable: true }

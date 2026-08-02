@@ -7,6 +7,7 @@ namespace Modules\Core\Services;
 use App\Support\Services\BaseService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Contracts\DistrictRepositoryInterface;
 use Modules\Core\Contracts\DistrictServiceInterface;
 use Modules\Core\Filters\DistrictFilter;
@@ -51,20 +52,18 @@ final class DistrictService extends BaseService implements DistrictServiceInterf
     }
 
     public function update(
-        District $district,
+        Model $district,
         array $attributes,
-    ): District {
+    ): Model {
         /** @var District */
         return $this->transaction(
             fn () => $this->districts->update($district, $attributes)
         );
     }
 
-    public function toggleStatus(
-        District $district,
-        bool $isActive,
-    ): District {
-        return $this->transaction(function () use ($district, $isActive) {
+    public function toggleStatus(Model $district, bool $isActive): Model
+    {
+        return $this->transaction(function () use ($district, $isActive): Model {
             /** @var District */
             return $this->districts->update($district, [
                 'is_active' => $isActive,
@@ -72,7 +71,17 @@ final class DistrictService extends BaseService implements DistrictServiceInterf
         });
     }
 
-    public function delete(District $district): bool
+    public function activate(Model $district): Model
+    {
+        return $this->toggleStatus($district, true);
+    }
+
+    public function deactivate(Model $district): Model
+    {
+        return $this->toggleStatus($district, false);
+    }
+
+    public function delete(Model $district): bool
     {
         return $this->transaction(
             fn () => $this->districts->delete($district)

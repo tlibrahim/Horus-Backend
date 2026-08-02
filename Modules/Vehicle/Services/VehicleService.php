@@ -8,6 +8,7 @@ use App\Support\Contracts\CrudRepositoryInterface;
 use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Vehicle\Contracts\Vehicle\VehicleRepositoryInterface;
 use Modules\Vehicle\Contracts\Vehicle\VehicleServiceInterface;
 use Modules\Vehicle\Models\Vehicle;
@@ -45,7 +46,7 @@ class VehicleService extends BaseCrudService implements VehicleServiceInterface
         return $this->createFromRepository($attributes);
     }
 
-    public function update(Vehicle $vehicle, array $attributes): Vehicle
+    public function update(Model $vehicle, array $attributes): Model
     {
         /** @var Vehicle */
         return $this->updateFromRepository($vehicle, $attributes);
@@ -56,13 +57,13 @@ class VehicleService extends BaseCrudService implements VehicleServiceInterface
         return $this->optionsFromRepository();
     }
 
-    public function toggleStatus(Vehicle $vehicle, bool $isActive): Vehicle
+    public function toggleStatus(Model $vehicle, bool $isActive): Model
     {
         /** @var Vehicle */
         return $this->toggleStatusFromRepository($vehicle, $isActive);
     }
 
-    public function delete(Vehicle $vehicle): bool
+    public function delete(Model $vehicle): bool
     {
         return $this->deleteFromRepository($vehicle);
     }

@@ -7,6 +7,7 @@ namespace Modules\Core\Services;
 use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Contracts\CountryRepositoryInterface;
 use Modules\Core\Contracts\CountryServiceInterface;
 use Modules\Core\Filters\CountryFilter;
@@ -46,22 +47,32 @@ final class CountryService extends BaseCrudService implements CountryServiceInte
     }
 
     public function update(
-        Country $country,
+        Model $country,
         array $attributes,
-    ): Country {
+    ): Model {
         /** @var Country */
         return $this->updateFromRepository($country, $attributes);
     }
 
-    public function toggleStatus(
-        Country $country,
-        bool $isActive,
-    ): Country {
+    public function toggleStatus(Model $country, bool $isActive): Model
+    {
         /** @var Country */
         return $this->toggleStatusOnRepository($country, $isActive);
     }
 
-    public function delete(Country $country): bool
+    public function activate(Model $country): Model
+    {
+        /** @var Country */
+        return $this->activateOnRepository($country);
+    }
+
+    public function deactivate(Model $country): Model
+    {
+        /** @var Country */
+        return $this->deactivateOnRepository($country);
+    }
+
+    public function delete(Model $country): bool
     {
         return $this->deleteFromRepository($country);
     }

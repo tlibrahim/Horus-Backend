@@ -7,6 +7,7 @@ namespace Modules\Vehicle\Services;
 use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Vehicle\Contracts\Generation\GenerationRepositoryInterface;
 use Modules\Vehicle\Contracts\Generation\GenerationServiceInterface;
 use Modules\Vehicle\Filters\GenerationFilter;
@@ -46,22 +47,34 @@ final class GenerationService extends BaseCrudService implements GenerationServi
     }
 
     public function update(
-        Generation $generation,
+        Model $generation,
         array $attributes,
-    ): Generation {
+    ): Model {
         /** @var Generation */
         return $this->updateFromRepository($generation, $attributes);
     }
 
     public function toggleStatus(
-        Generation $generation,
+        Model $generation,
         bool $isActive,
-    ): Generation {
+    ): Model {
         /** @var Generation */
         return $this->toggleStatusOnRepository($generation, $isActive);
     }
 
-    public function delete(Generation $generation): bool
+    public function activate(Model $generation): Model
+    {
+        /** @var Generation */
+        return $this->activateOnRepository($generation);
+    }
+
+    public function deactivate(Model $generation): Model
+    {
+        /** @var Generation */
+        return $this->deactivateOnRepository($generation);
+    }
+
+    public function delete(Model $generation): bool
     {
         return $this->deleteFromRepository($generation);
     }

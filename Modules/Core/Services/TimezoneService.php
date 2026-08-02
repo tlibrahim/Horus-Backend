@@ -7,6 +7,7 @@ namespace Modules\Core\Services;
 use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Contracts\TimezoneRepositoryInterface;
 use Modules\Core\Contracts\TimezoneServiceInterface;
 use Modules\Core\Filters\TimezoneFilter;
@@ -46,22 +47,32 @@ final class TimezoneService extends BaseCrudService implements TimezoneServiceIn
     }
 
     public function update(
-        Timezone $timezone,
+        Model $timezone,
         array $attributes,
-    ): Timezone {
+    ): Model {
         /** @var Timezone */
         return $this->updateFromRepository($timezone, $attributes);
     }
 
-    public function toggleStatus(
-        Timezone $timezone,
-        bool $isActive,
-    ): Timezone {
+    public function toggleStatus(Model $timezone, bool $isActive): Model
+    {
         /** @var Timezone */
         return $this->toggleStatusOnRepository($timezone, $isActive);
     }
 
-    public function delete(Timezone $timezone): bool
+    public function activate(Model $timezone): Model
+    {
+        /** @var Timezone */
+        return $this->activateOnRepository($timezone);
+    }
+
+    public function deactivate(Model $timezone): Model
+    {
+        /** @var Timezone */
+        return $this->deactivateOnRepository($timezone);
+    }
+
+    public function delete(Model $timezone): bool
     {
         return $this->deleteFromRepository($timezone);
     }

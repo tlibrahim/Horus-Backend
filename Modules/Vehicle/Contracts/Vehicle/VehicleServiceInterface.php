@@ -6,6 +6,7 @@ namespace Modules\Vehicle\Contracts\Vehicle;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Vehicle\Models\Vehicle;
 
 interface VehicleServiceInterface
@@ -18,11 +19,11 @@ interface VehicleServiceInterface
 
     public function create(array $attributes): Vehicle;
 
-    public function update(Vehicle $vehicle, array $attributes): Vehicle;
+    public function update(Model $vehicle, array $attributes): Model;
 
     public function options(): Collection;
 
-    public function toggleStatus(Vehicle $vehicle, bool $isActive): Vehicle;
+    public function toggleStatus(Model $vehicle, bool $isActive): Model;
 
-    public function delete(Vehicle $vehicle): bool;
+    public function delete(Model $vehicle): bool;
 }

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Modules\Vehicle\Contracts\Generation;
 
+use App\Support\Contracts\ActivatableServiceInterface;
+use App\Support\Contracts\CrudServiceInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Vehicle\Models\Generation;
 
-interface GenerationServiceInterface
+interface GenerationServiceInterface extends ActivatableServiceInterface, CrudServiceInterface
 {
     public function all(): iterable;
 
@@ -18,11 +20,5 @@ interface GenerationServiceInterface
 
     public function create(array $attributes): Generation;
 
-    public function update(Generation $generation, array $attributes): Generation;
-
     public function options(): Collection;
-
-    public function toggleStatus(Generation $generation, bool $isActive): Generation;
-
-    public function delete(Generation $generation): bool;
 }

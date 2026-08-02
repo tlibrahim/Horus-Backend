@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Modules\Core\Contracts;
 
+use App\Support\Contracts\ActivatableServiceInterface;
+use App\Support\Contracts\CrudServiceInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Core\Models\Language;
 
-interface LanguageServiceInterface
+interface LanguageServiceInterface extends ActivatableServiceInterface, CrudServiceInterface
 {
     public function all(): iterable;
 
@@ -18,11 +20,5 @@ interface LanguageServiceInterface
 
     public function create(array $attributes): Language;
 
-    public function update(Language $language, array $attributes): Language;
-
     public function options(): Collection;
-
-    public function toggleStatus(Language $language, bool $isActive): Language;
-
-    public function delete(Language $language): bool;
 }

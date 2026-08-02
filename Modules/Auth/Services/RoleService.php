@@ -7,6 +7,7 @@ namespace Modules\Auth\Services;
 use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Auth\Contracts\Repositories\RoleRepositoryInterface;
 use Modules\Auth\Contracts\Services\RoleServiceInterface;
 use Modules\Auth\Filters\RoleFilter;
@@ -45,25 +46,25 @@ final class RoleService extends BaseCrudService implements RoleServiceInterface
         return $this->createFromRepository($attributes);
     }
 
-    public function update(Role $role, array $attributes): Role
+    public function update(Model $role, array $attributes): Model
     {
         /** @var Role */
         return $this->updateFromRepository($role, $attributes);
     }
 
-    public function toggleStatus(Role $role, bool $isActive): Role
+    public function toggleStatus(Model $role, bool $isActive): Model
     {
         /** @var Role */
         return $this->toggleStatusOnRepository($role, $isActive);
     }
 
-    public function activate(Role $role): Role
+    public function activate(Model $role): Model
     {
         /** @var Role */
         return $this->activateOnRepository($role);
     }
 
-    public function deactivate(Role $role): Role
+    public function deactivate(Model $role): Model
     {
         /** @var Role */
         return $this->deactivateOnRepository($role);
@@ -83,7 +84,7 @@ final class RoleService extends BaseCrudService implements RoleServiceInterface
         return $role->permissions()->get();
     }
 
-    public function delete(Role $role): bool
+    public function delete(Model $role): bool
     {
         return $this->deleteFromRepository($role);
     }

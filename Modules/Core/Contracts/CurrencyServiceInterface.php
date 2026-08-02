@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Modules\Core\Contracts;
 
+use App\Support\Contracts\ActivatableServiceInterface;
+use App\Support\Contracts\CrudServiceInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Core\Models\Currency;
 
-interface CurrencyServiceInterface
+interface CurrencyServiceInterface extends ActivatableServiceInterface, CrudServiceInterface
 {
     public function all(): iterable;
 
@@ -18,11 +20,5 @@ interface CurrencyServiceInterface
 
     public function create(array $attributes): Currency;
 
-    public function update(Currency $currency, array $attributes): Currency;
-
     public function options(): Collection;
-
-    public function toggleStatus(Currency $currency, bool $isActive): Currency;
-
-    public function delete(Currency $currency): bool;
 }
