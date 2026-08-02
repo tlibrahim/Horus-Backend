@@ -7,6 +7,7 @@ namespace Modules\Core\Services;
 use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Contracts\CurrencyRepositoryInterface;
 use Modules\Core\Contracts\CurrencyServiceInterface;
 use Modules\Core\Filters\CurrencyFilter;
@@ -46,22 +47,32 @@ final class CurrencyService extends BaseCrudService implements CurrencyServiceIn
     }
 
     public function update(
-        Currency $currency,
+        Model $currency,
         array $attributes,
-    ): Currency {
+    ): Model {
         /** @var Currency */
         return $this->updateFromRepository($currency, $attributes);
     }
 
-    public function toggleStatus(
-        Currency $currency,
-        bool $isActive,
-    ): Currency {
+    public function toggleStatus(Model $currency, bool $isActive): Model
+    {
         /** @var Currency */
         return $this->toggleStatusOnRepository($currency, $isActive);
     }
 
-    public function delete(Currency $currency): bool
+    public function activate(Model $currency): Model
+    {
+        /** @var Currency */
+        return $this->activateOnRepository($currency);
+    }
+
+    public function deactivate(Model $currency): Model
+    {
+        /** @var Currency */
+        return $this->deactivateOnRepository($currency);
+    }
+
+    public function delete(Model $currency): bool
     {
         return $this->deleteFromRepository($currency);
     }

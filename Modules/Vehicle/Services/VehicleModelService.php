@@ -7,6 +7,7 @@ namespace Modules\Vehicle\Services;
 use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Vehicle\Contracts\VehicleModel\VehicleModelRepositoryInterface;
 use Modules\Vehicle\Contracts\VehicleModel\VehicleModelServiceInterface;
 use Modules\Vehicle\Filters\VehicleModelFilter;
@@ -46,22 +47,34 @@ final class VehicleModelService extends BaseCrudService implements VehicleModelS
     }
 
     public function update(
-        VehicleModel $vehicleModel,
+        Model $vehicleModel,
         array $attributes,
-    ): VehicleModel {
+    ): Model {
         /** @var VehicleModel */
         return $this->updateFromRepository($vehicleModel, $attributes);
     }
 
     public function toggleStatus(
-        VehicleModel $vehicleModel,
+        Model $vehicleModel,
         bool $isActive,
-    ): VehicleModel {
+    ): Model {
         /** @var VehicleModel */
         return $this->toggleStatusOnRepository($vehicleModel, $isActive);
     }
 
-    public function delete(VehicleModel $vehicleModel): bool
+    public function activate(Model $vehicleModel): Model
+    {
+        /** @var VehicleModel */
+        return $this->activateOnRepository($vehicleModel);
+    }
+
+    public function deactivate(Model $vehicleModel): Model
+    {
+        /** @var VehicleModel */
+        return $this->deactivateOnRepository($vehicleModel);
+    }
+
+    public function delete(Model $vehicleModel): bool
     {
         return $this->deleteFromRepository($vehicleModel);
     }

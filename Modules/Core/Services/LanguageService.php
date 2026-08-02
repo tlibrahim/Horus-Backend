@@ -7,6 +7,7 @@ namespace Modules\Core\Services;
 use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Contracts\LanguageRepositoryInterface;
 use Modules\Core\Contracts\LanguageServiceInterface;
 use Modules\Core\Filters\LanguageFilter;
@@ -46,22 +47,32 @@ final class LanguageService extends BaseCrudService implements LanguageServiceIn
     }
 
     public function update(
-        Language $language,
+        Model $language,
         array $attributes,
-    ): Language {
+    ): Model {
         /** @var Language */
         return $this->updateFromRepository($language, $attributes);
     }
 
-    public function toggleStatus(
-        Language $language,
-        bool $isActive,
-    ): Language {
+    public function toggleStatus(Model $language, bool $isActive): Model
+    {
         /** @var Language */
         return $this->toggleStatusOnRepository($language, $isActive);
     }
 
-    public function delete(Language $language): bool
+    public function activate(Model $language): Model
+    {
+        /** @var Language */
+        return $this->activateOnRepository($language);
+    }
+
+    public function deactivate(Model $language): Model
+    {
+        /** @var Language */
+        return $this->deactivateOnRepository($language);
+    }
+
+    public function delete(Model $language): bool
     {
         return $this->deleteFromRepository($language);
     }

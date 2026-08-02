@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Modules\Core\Contracts;
 
+use App\Support\Contracts\ActivatableServiceInterface;
+use App\Support\Contracts\CrudServiceInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Core\Models\District;
 
-interface DistrictServiceInterface
+interface DistrictServiceInterface extends ActivatableServiceInterface, CrudServiceInterface
 {
     public function all(): iterable;
 
@@ -18,11 +20,5 @@ interface DistrictServiceInterface
 
     public function create(array $attributes): District;
 
-    public function update(District $district, array $attributes): District;
-
     public function options(): Collection;
-
-    public function toggleStatus(District $district, bool $isActive): District;
-
-    public function delete(District $district): bool;
 }

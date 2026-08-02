@@ -117,6 +117,23 @@ abstract class BaseRepository implements CrudRepositoryInterface
         return $query->get($columns);
     }
 
+    public function toggleStatus(Model $model, bool $isActive): Model
+    {
+        return $this->update($model, [
+            'is_active' => $isActive,
+        ]);
+    }
+
+    public function activate(Model $model): Model
+    {
+        return $this->toggleStatus($model, true);
+    }
+
+    public function deactivate(Model $model): Model
+    {
+        return $this->toggleStatus($model, false);
+    }
+
     /**
      * Delete a model.
      */

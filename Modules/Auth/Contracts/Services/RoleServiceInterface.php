@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Contracts\Services;
 
+use App\Support\Contracts\ActivatableServiceInterface;
+use App\Support\Contracts\CrudServiceInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Auth\Models\Role;
 
-interface RoleServiceInterface
+interface RoleServiceInterface extends ActivatableServiceInterface, CrudServiceInterface
 {
     public function all(): iterable;
 
@@ -18,19 +20,9 @@ interface RoleServiceInterface
 
     public function create(array $attributes): Role;
 
-    public function update(Role $role, array $attributes): Role;
-
     public function options(): Collection;
-
-    public function toggleStatus(Role $role, bool $isActive): Role;
-
-    public function activate(Role $role): Role;
-
-    public function deactivate(Role $role): Role;
 
     public function syncPermissions(Role $role, array $permissionIds): Role;
 
     public function permissions(Role $role): Collection;
-
-    public function delete(Role $role): bool;
 }

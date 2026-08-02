@@ -7,6 +7,7 @@ namespace Modules\Core\Services;
 use App\Support\Services\BaseService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Contracts\CityRepositoryInterface;
 use Modules\Core\Contracts\CityServiceInterface;
 use Modules\Core\Filters\CityFilter;
@@ -51,20 +52,18 @@ final class CityService extends BaseService implements CityServiceInterface
     }
 
     public function update(
-        City $city,
+        Model $city,
         array $attributes,
-    ): City {
+    ): Model {
         /** @var City */
         return $this->transaction(
             fn () => $this->cities->update($city, $attributes)
         );
     }
 
-    public function toggleStatus(
-        City $city,
-        bool $isActive,
-    ): City {
-        return $this->transaction(function () use ($city, $isActive) {
+    public function toggleStatus(Model $city, bool $isActive): Model
+    {
+        return $this->transaction(function () use ($city, $isActive): Model {
             /** @var City */
             return $this->cities->update($city, [
                 'is_active' => $isActive,
@@ -72,7 +71,17 @@ final class CityService extends BaseService implements CityServiceInterface
         });
     }
 
-    public function delete(City $city): bool
+    public function activate(Model $city): Model
+    {
+        return $this->toggleStatus($city, true);
+    }
+
+    public function deactivate(Model $city): Model
+    {
+        return $this->toggleStatus($city, false);
+    }
+
+    public function delete(Model $city): bool
     {
         return $this->transaction(
             fn () => $this->cities->delete($city)

@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
             $table->string('key')->unique();
-            $table->text('value')->nullable();
+            $table->json('value')->nullable();
             $table->string('type', 50);
             $table->string('group', 100);
             $table->text('description')->nullable();
             $table->boolean('is_public')->default(false);
+            $table->boolean('is_editable')->default(true);
             $table->timestamps();
         });
     }
