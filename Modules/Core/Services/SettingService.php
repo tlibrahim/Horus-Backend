@@ -7,6 +7,7 @@ namespace Modules\Core\Services;
 use App\Support\Services\BaseCrudService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Contracts\Settings\Repositories\SettingRepositoryInterface;
 use Modules\Core\Contracts\Settings\Services\SettingServiceInterface;
 use Modules\Core\Filters\SettingFilter;
@@ -52,9 +53,9 @@ final class SettingService extends BaseCrudService implements SettingServiceInte
     }
 
     public function update(
-        Setting $setting,
+        Model $setting,
         array $attributes,
-    ): Setting {
+    ): Model {
         /** @var Setting */
         return $this->updateFromRepository(
             $setting,
@@ -63,7 +64,7 @@ final class SettingService extends BaseCrudService implements SettingServiceInte
     }
 
     public function delete(
-        Setting $setting,
+        Model $setting,
     ): bool {
         return $this->deleteFromRepository($setting);
     }
